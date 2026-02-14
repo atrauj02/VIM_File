@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Nomor Telepon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 0;
+            margin-bottom: 30px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #e0e0e0;
+        }
+
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input[type="number"] {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Hide spinner for number input */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-mode {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .input-container {
+            display: none;
+        }
+
+        .input-container.active {
+            display: block;
+        }
+
+        .helper-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .helper-text strong {
+            color: #667eea;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button.btn-clear {
+            background: #dc3545;
+        }
+
+        button.btn-clear:hover {
+            background: #c82333;
+        }
+
+        button.btn-export {
+            background: #28a745;
+        }
+
+        button.btn-export:hover {
+            background: #218838;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+            animation: slideIn 0.3s ease;
+            white-space: pre-line;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .database-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .database-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .database-header h2 {
+            color: #333;
+            font-size: 20px;
+        }
+
+        .phone-list {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-right: 1px solid rgba(255,255,255,0.2);
+            border-bottom: 2px solid #5568d3;
+        }
+
+        th:last-child {
+            border-right: none;
+        }
+
+        th.col-no {
+            width: 60px;
+            text-align: center;
+        }
+
+        th.col-code {
+            width: 120px;
+        }
+
+        th.col-year {
+            width: 100px;
+        }
+
+        th.col-phone {
+            width: 200px;
+        }
+
+        th.col-date {
+            width: 180px;
+        }
+
+        th.col-action {
+            width: 100px;
+            text-align: center;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: #f0f2f5;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        td {
+            padding: 12px;
+            color: #333;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        td:last-child {
+            border-right: none;
+        }
+
+        td.col-no {
+            text-align: center;
+            color: #999;
+            font-weight: 500;
+            background: #fafafa;
+        }
+
+        td.col-code {
+            font-weight: 600;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+        }
+
+        td.col-year {
+            font-weight: 600;
+            color: #28a745;
+            text-align: center;
+        }
+
+        td.col-phone {
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        td.col-date {
+            color: #666;
+            font-size: 13px;
+        }
+
+        td.col-action {
+            text-align: center;
+        }
+
+        .database-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .database-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .database-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            width: 300px;
+            font-size: 14px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .table-wrapper {
+            max-height: 600px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .table-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .duplicate-card {
+            background: white;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+        }
+
+        .duplicate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #fff3cd;
+        }
+
+        .duplicate-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .duplicate-badge {
+            background: #ffc107;
+            color: #856404;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .duplicate-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .duplicate-attempts {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .attempt-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .attempt-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .attempt-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .attempt-icon {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .warning-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .warning-box p {
+            color: #856404;
+            margin: 0;
+        }
+
+        .phone-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .phone-item:hover {
+            transform: translateX(5px);
+        }
+
+        .phone-number {
+            font-size: 18px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .phone-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .btn-delete {
+            padding: 8px 15px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Database Nomor Telepon</h1>
+        <p class="subtitle">Sistem otomatis mencegah duplikasi nomor • Kapasitas: Unlimited ∞</p>
+
+        <!-- Navigation Tabs -->
+        <div class="main-nav">
+            <button class="nav-tab active" onclick="switchPage('input')">📝 Input Data</button>
+            <button class="nav-tab" onclick="switchPage('database')">📊 Database</button>
+            <button class="nav-tab" onclick="switchPage('duplicates')">⚠️ Laporan Duplikasi</button>
+        </div>
+
+        <!-- PAGE: INPUT DATA -->
+        <div id="inputPage" class="page-content active">
+            <div class="input-section">
+                <div id="alert" class="alert"></div>
+                
+                <!-- Mode Selector -->
+                <div class="input-mode">
+                    <button class="mode-btn active" onclick="switchMode('single')">Input Satuan</button>
+                    <button class="mode-btn" onclick="switchMode('bulk')">Input Massal</button>
+                </div>
+
+                <!-- Single Input Mode -->
+                <div id="singleMode" class="input-container active">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="codeInput" 
+                            placeholder="Kode (opsional)"
+                            maxlength="20"
+                            style="flex: 0 0 150px;"
+                        >
+                        <input 
+                            type="number" 
+                            id="yearInput" 
+                            placeholder="Tahun (opsional)"
+                            min="2000"
+                            max="2100"
+                            style="flex: 0 0 120px;"
+                        >
+                        <input 
+                            type="text" 
+                            id="phoneInput" 
+                            placeholder="Masukkan nomor telepon (contoh: 081234567890)"
+                            maxlength="15"
+                        >
+                        <button onclick="addPhone()">Tambah</button>
+                    </div>
+                    <div class="helper-text">
+                        Masukkan <strong>kode</strong> (opsional), <strong>tahun</strong> (opsional), dan <strong>nomor telepon</strong>, lalu tekan <strong>Tambah</strong> atau <strong>Enter</strong>
+                    </div>
+                </div>
+
+                <!-- Bulk Input Mode -->
+                <div id="bulkMode" class="input-container">
+                    <textarea 
+                        id="bulkInput" 
+                        placeholder="Masukkan banyak nomor sekaligus. Tahun OPSIONAL!&#10;&#10;Format Lengkap (dengan tahun):&#10;ABC | 2023 | 081234567890&#10;DEF | 2024 | 082345678901&#10;&#10;Format Tanpa Kode:&#10;2023 | 081234567890&#10;2024 | 082345678901&#10;&#10;Format Tanpa Tahun (tahun kosong):&#10;ABC | 081234567890&#10;DEF | 082345678901&#10;&#10;Atau hanya nomor:&#10;081234567890&#10;082345678901"
+                    ></textarea>
+                    <div class="helper-text">
+                        Format: <strong>KODE | TAHUN | NOMOR</strong> atau <strong>KODE | NOMOR</strong> atau <strong>TAHUN | NOMOR</strong> atau hanya <strong>NOMOR</strong><br>
+                        Pisahkan dengan tanda <strong>|</strong> (pipe) atau <strong>tab</strong>. <strong>Tahun boleh dikosongkan!</strong>
+                    </div>
+                    <button onclick="addBulkPhones()" style="width: 100%; margin-top: 10px;">
+                        📥 Proses Semua Nomor
+                    </button>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-export" onclick="exportCSV()">📊 Export ke CSV</button>
+                    <button class="btn-export" onclick="exportData()">📥 Export TXT</button>
+                    <button class="btn-clear" onclick="clearAll()">🗑️ Hapus Semua</button>
+                </div>
+                
+                <div style="margin-top: 10px; text-align: center;">
+                    <input type="file" id="fileImport" accept=".csv,.txt" style="display: none;" onchange="importFile(event)">
+                    <button onclick="document.getElementById('fileImport').click()" style="width: 100%; background: #17a2b8;">
+                        📤 Import dari File (CSV/TXT)
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalNumbers">0</div>
+                    <div class="stat-label">Total Nomor</div>
+                </div>
+                <div class="stat-card" style="position: relative;">
+                    <div class="stat-number" id="duplicateAttempts">0</div>
+                    <div class="stat-label">Duplikasi Dicegah</div>
+                    <button onclick="resetDuplicateCounter()" style="position: absolute; bottom: 10px; right: 10px; padding: 5px 10px; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5); border-radius: 5px; color: white; font-size: 11px; cursor: pointer; font-weight: 600;">🔄 Reset</button>
+                </div>
+            </div>
+
+            <div class="database-section">
+                <div class="database-header">
+                    <h2>Preview Data Terbaru</h2>
+                </div>
+                <div id="phoneList" class="phone-list"></div>
+            </div>
+        </div>
+
+        <!-- PAGE: DATABASE -->
+        <div id="databasePage" class="page-content">
+            <div class="database-header">
+                <div class="database-title">📊 Rekap Database Nomor Telepon</div>
+                <div class="database-actions">
+                    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari kode atau nomor..." onkeyup="searchDatabase()">
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <div id="databaseTable"></div>
+            </div>
+
+            <div class="table-info">
+                <div>
+                    Menampilkan <strong id="displayCount">0</strong> dari <strong id="totalCount">0</strong> nomor
+                </div>
+                <div>
+                    <button class="btn-export" onclick="exportCSV()">📊 Export CSV</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: LAPORAN DUPLIKASI -->
+        <div id="duplicatesPage" class="page-content">
+            <div class="database-header">
+                <div class="database-title">⚠️ Laporan Duplikasi</div>
+                <div class="database-actions">
+                    <button class="btn-clear" onclick="clearDuplicateLog()">🗑️ Hapus Log Duplikasi</button>
+                </div>
+            </div>
+
+            <div id="duplicateContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Inisialisasi database dari localStorage
+        let phoneDatabase = JSON.parse(localStorage.getItem('phoneDatabase')) || [];
+        let duplicateCount = parseInt(localStorage.getItem('duplicateCount')) || 0;
+        let duplicateLog = JSON.parse(localStorage.getItem('duplicateLog')) || {};
+        let currentMode = 'single';
+        let currentPage = 'input';
+        let filteredData = [];
+
+        // Tampilkan data saat halaman dimuat
+        window.onload = function() {
+            displayPhones();
+            displayDatabase();
+            displayDuplicates();
+            updateStats();
+        };
+
+        // Fungsi untuk switch halaman
+        function switchPage(page) {
+            currentPage = page;
+            
+            // Update tab navigation
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide pages
+            document.getElementById('inputPage').classList.remove('active');
+            document.getElementById('databasePage').classList.remove('active');
+            document.getElementById('duplicatesPage').classList.remove('active');
+            
+            if (page === 'input') {
+                document.getElementById('inputPage').classList.add('active');
+            } else if (page === 'database') {
+                document.getElementById('databasePage').classList.add('active');
+                displayDatabase();
+            } else if (page === 'duplicates') {
+                document.getElementById('duplicatesPage').classList.add('active');
+                displayDuplicates();
+            }
+        }
+
+        // Fungsi untuk menampilkan database lengkap
+        function displayDatabase() {
+            const databaseTable = document.getElementById('databaseTable');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Filter data berdasarkan search (termasuk tahun)
+            if (searchTerm) {
+                filteredData = phoneDatabase.filter(item => 
+                    item.code.toLowerCase().includes(searchTerm) || 
+                    item.number.includes(searchTerm) ||
+                    (item.year && item.year.toString().includes(searchTerm))
+                );
+            } else {
+                filteredData = [...phoneDatabase];
+            }
+
+            // Update counts
+            document.getElementById('displayCount').textContent = filteredData.length;
+            document.getElementById('totalCount').textContent = phoneDatabase.length;
+            
+            if (filteredData.length === 0) {
+                databaseTable.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                        <p>${searchTerm ? 'Tidak ada hasil yang ditemukan' : 'Belum ada nomor tersimpan'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Reverse untuk menampilkan yang terbaru di atas
+            const sortedData = [...filteredData].reverse();
+            
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-no">No</th>
+                            <th class="col-code">Kode</th>
+                            <th class="col-year">Tahun</th>
+                            <th class="col-phone">Nomor Telepon</th>
+                            <th class="col-date">Tanggal Ditambahkan</th>
+                            <th class="col-action">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            sortedData.forEach((item, index) => {
+                const originalIndex = phoneDatabase.findIndex(p => p.number === item.number);
+                tableHTML += `
+                    <tr>
+                        <td class="col-no">${index + 1}</td>
+                        <td class="col-code">${item.code || '-'}</td>
+                        <td class="col-year">${item.year || '-'}</td>
+                        <td class="col-phone">${formatPhoneNumber(item.number)}</td>
+                        <td class="col-date">${item.addedDate}</td>
+                        <td class="col-action">
+                            <button class="btn-delete" onclick="deletePhone(${originalIndex})">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            databaseTable.innerHTML = tableHTML;
+        }
+
+        // Fungsi untuk search database
+        function searchDatabase() {
+            displayDatabase();
+        }
+
+        // Fungsi untuk log duplikasi
+        function logDuplicate(phoneNumber, code, year) {
+            if (!duplicateLog[phoneNumber]) {
+                duplicateLog[phoneNumber] = {
+                    number: phoneNumber,
+                    code: code || '-',
+                    year: year || '',
+                    attempts: []
+                };
+            }
+            
+            duplicateLog[phoneNumber].attempts.push({
+                timestamp: new Date().toLocaleString('id-ID'),
+                code: code || '-',
+                year: year || ''
+            });
+            
+            localStorage.setItem('duplicateLog', JSON.stringify(duplicateLog));
+        }
+
+        // Fungsi untuk menampilkan laporan duplikasi
+        function displayDuplicates() {
+            const duplicateContent = document.getElementById('duplicateContent');
+            
+            const duplicates = Object.values(duplicateLog);
+            
+            if (duplicates.length === 0) {
+                duplicateContent.innerHTML = `
+                    <div class="warning-box">
+                        <h3>✅ Tidak Ada Duplikasi Terdeteksi</h3>
+                        <p>Belum ada nomor yang dicoba diinput lebih dari sekali.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort berdasarkan jumlah percobaan (terbanyak di atas)
+            duplicates.sort((a, b) => b.attempts.length - a.attempts.length);
+
+            let html = `
+                <div class="warning-box">
+                    <h3>⚠️ Ditemukan ${duplicates.length} Nomor dengan Percobaan Duplikasi</h3>
+                    <p>Berikut adalah nomor-nomor yang pernah dicoba diinput lebih dari sekali (dicegah oleh sistem)</p>
+                </div>
+            `;
+
+            duplicates.forEach(dup => {
+                // Cari data asli di database
+                const original = phoneDatabase.find(p => p.number === dup.number);
+                
+                html += `
+                    <div class="duplicate-card">
+                        <div class="duplicate-header">
+                            <div class="duplicate-number">${formatPhoneNumber(dup.number)}</div>
+                            <div class="duplicate-badge">${dup.attempts.length} Percobaan</div>
+                        </div>
+                        
+                        <div class="duplicate-info">
+                            <div class="info-item">
+                                <div class="info-label">Kode</div>
+                                <div class="info-value">${original ? original.code : dup.code}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Status</div>
+                                <div class="info-value">${original ? '✅ Tersimpan di Database' : '❌ Tidak Tersimpan'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Pertama Kali Ditambahkan</div>
+                                <div class="info-value">${original ? original.addedDate : '-'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Total Percobaan Duplikasi</div>
+                                <div class="info-value">${dup.attempts.length} kali</div>
+                            </div>
+                        </div>
+
+                        <div class="duplicate-attempts">
+                            <div class="attempt-title">📋 Riwayat Percobaan Input:</div>
+                            <div class="attempt-list">
+                `;
+
+                dup.attempts.forEach((attempt, index) => {
+                    html += `
+                        <div class="attempt-item">
+                            <span class="attempt-icon">${index + 1}.</span>
+                            <span>Dicoba pada: <strong>${attempt.timestamp}</strong></span>
+                            ${attempt.code !== '-' ? `<span>dengan kode: <strong>${attempt.code}</strong></span>` : ''}
+                        </div>
+                    `;
+                });
+
+                html += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            duplicateContent.innerHTML = html;
+        }
+
+        // Fungsi untuk hapus log duplikasi
+        function clearDuplicateLog() {
+            if (Object.keys(duplicateLog).length === 0 && duplicateCount === 0) {
+                showAlert('Log duplikasi sudah kosong!', 'info');
+                return;
+            }
+
+            if (confirm('Yakin ingin menghapus semua log duplikasi? (Data nomor tidak akan terhapus, hanya log history duplikasi)')) {
+                // Reset semua variabel
+                duplicateLog = {};
+                duplicateCount = 0;
+                
+                // Save ke localStorage
+                localStorage.setItem('duplicateLog', JSON.stringify(duplicateLog));
+                localStorage.setItem('duplicateCount', '0');
+                
+                // Refresh tampilan
+                displayDuplicates();
+                updateStats();
+                
+                showAlert('✓ Log duplikasi berhasil dihapus! Counter direset ke 0.', 'success');
+                
+                // Force reload jika masih ada masalah (optional)
+                // setTimeout(() => location.reload(), 1000);
+            }
+        }
+
+        // Fungsi untuk reset counter duplikasi (shortcut dari halaman input)
+        function resetDuplicateCounter() {
+            if (confirm('Reset counter "Duplikasi Dicegah" ke 0?\n\n(Data nomor tidak akan terhapus, hanya counter dan log duplikasi)')) {
+                // Reset semua variabel
+                duplicateLog = {};
+                duplicateCount = 0;
+                
+                // Save ke localStorage
+                localStorage.setItem('duplicateLog', JSON.stringify(duplicateLog));
+                localStorage.setItem('duplicateCount', '0');
+                
+                // Refresh tampilan
+                displayDuplicates();
+                updateStats();
+                
+                showAlert('✓ Counter berhasil direset ke 0!', 'success');
+            }
+        }
+
+        // Fungsi untuk switch mode input
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update tombol mode
+            const buttons = document.querySelectorAll('.mode-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide input containers
+            document.getElementById('singleMode').classList.remove('active');
+            document.getElementById('bulkMode').classList.remove('active');
+            
+            if (mode === 'single') {
+                document.getElementById('singleMode').classList.add('active');
+            } else {
+                document.getElementById('bulkMode').classList.add('active');
+            }
+        }
+
+        // Fungsi untuk proses bulk input
+        function addBulkPhones() {
+            const bulkInput = document.getElementById('bulkInput');
+            const inputText = bulkInput.value.trim();
+
+            if (inputText === '') {
+                showAlert('Mohon masukkan nomor telepon!', 'warning');
+                return;
+            }
+
+            // Split berdasarkan baris baru dan filter yang kosong
+            const lines = inputText.split(/[\n]/).map(line => line.trim()).filter(line => line !== '');
+
+            if (lines.length === 0) {
+                showAlert('Tidak ada nomor valid untuk diproses!', 'warning');
+                return;
+            }
+
+            let addedCount = 0;
+            let duplicateInBatch = 0;
+            let invalidCount = 0;
+            const processedNumbers = new Set();
+
+            // Proses setiap baris
+            lines.forEach(line => {
+                let code = '-';
+                let year = ''; // Opsional
+                let phoneNumber = '';
+
+                // Cek apakah ada pemisah (| atau tab)
+                if (line.includes('|')) {
+                    const parts = line.split('|').map(p => p.trim());
+                    
+                    if (parts.length >= 3) {
+                        // Format: KODE | TAHUN | NOMOR
+                        code = parts[0].toUpperCase() || '-';
+                        year = parts[1] || ''; // Bisa kosong
+                        phoneNumber = parts[2].replace(/\D/g, '');
+                    } else if (parts.length === 2) {
+                        // Cek apakah parts[0] adalah tahun (4 digit angka)
+                        if (/^\d{4}$/.test(parts[0])) {
+                            // Format: TAHUN | NOMOR
+                            year = parts[0];
+                            phoneNumber = parts[1].replace(/\D/g, '');
+                        } else {
+                            // Format: KODE | NOMOR (tanpa tahun)
+                            code = parts[0].toUpperCase() || '-';
+                            phoneNumber = parts[1].replace(/\D/g, '');
+                        }
+                    } else {
+                        phoneNumber = parts[0].replace(/\D/g, '');
+                    }
+                } else if (line.includes('\t')) {
+                    const parts = line.split('\t').map(p => p.trim());
+                    
+                    if (parts.length >= 3) {
+                        code = parts[0].toUpperCase() || '-';
+                        year = parts[1] || '';
+                        phoneNumber = parts[2].replace(/\D/g, '');
+                    } else if (parts.length === 2) {
+                        if (/^\d{4}$/.test(parts[0])) {
+                            year = parts[0];
+                            phoneNumber = parts[1].replace(/\D/g, '');
+                        } else {
+                            code = parts[0].toUpperCase() || '-';
+                            phoneNumber = parts[1].replace(/\D/g, '');
+                        }
+                    } else {
+                        phoneNumber = parts[0].replace(/\D/g, '');
+                    }
+                } else {
+                    // Hanya nomor tanpa kode dan tahun
+                    phoneNumber = line.replace(/\D/g, '');
+                }
+
+                // Validasi minimal 10 digit
+                if (phoneNumber.length < 10) {
+                    invalidCount++;
+                    return;
+                }
+
+                // Cek duplikasi dalam batch yang sedang diproses
+                if (processedNumbers.has(phoneNumber)) {
+                    duplicateInBatch++;
+                    return;
+                }
+
+                processedNumbers.add(phoneNumber);
+
+                // Cek duplikasi dengan database yang sudah ada
+                const isDuplicate = phoneDatabase.some(item => item.number === phoneNumber);
+
+                if (isDuplicate) {
+                    duplicateInBatch++;
+                    logDuplicate(phoneNumber, code, year);
+                } else {
+                    // Tambahkan nomor baru
+                    const newEntry = {
+                        code: code,
+                        year: year, // Bisa kosong
+                        number: phoneNumber,
+                        addedDate: new Date().toLocaleString('id-ID')
+                    };
+                    
+                    phoneDatabase.push(newEntry);
+                    addedCount++;
+                }
+            });
+
+            // Update duplicate counter
+            duplicateCount += duplicateInBatch;
+            localStorage.setItem('duplicateCount', duplicateCount);
+
+            // Simpan ke localStorage
+            saveToLocalStorage();
+            displayPhones();
+            displayDatabase();
+            displayDuplicates();
+            updateStats();
+
+            // Tampilkan hasil
+            let message = `✓ Proses selesai!\n`;
+            message += `• ${addedCount} nomor baru ditambahkan\n`;
+            message += `• ${duplicateInBatch} duplikasi dicegah\n`;
+            if (invalidCount > 0) {
+                message += `• ${invalidCount} nomor tidak valid diabaikan`;
+            }
+
+            showAlert(message, 'success');
+
+            // Kosongkan textarea
+            bulkInput.value = '';
+        }
+
+        // Fungsi untuk menambah nomor telepon
+        function addPhone() {
+            const codeInput = document.getElementById('codeInput');
+            const yearInput = document.getElementById('yearInput');
+            const phoneInputEl = document.getElementById('phoneInput');
+            let phoneNumber = phoneInputEl.value.trim();
+            let code = codeInput.value.trim().toUpperCase();
+            let year = yearInput.value.trim(); // Opsional, bisa kosong
+
+            // Validasi input kosong
+            if (phoneNumber === '') {
+                showAlert('Mohon masukkan nomor telepon!', 'warning');
+                return;
+            }
+
+            // Bersihkan nomor dari karakter non-digit
+            phoneNumber = phoneNumber.replace(/\D/g, '');
+
+            // Validasi format nomor (minimal 10 digit)
+            if (phoneNumber.length < 10) {
+                showAlert('Nomor telepon harus minimal 10 digit!', 'warning');
+                return;
+            }
+
+            // Cek duplikasi
+            const isDuplicate = phoneDatabase.some(item => item.number === phoneNumber);
+
+            if (isDuplicate) {
+                duplicateCount++;
+                localStorage.setItem('duplicateCount', duplicateCount);
+                logDuplicate(phoneNumber, code, year);
+                displayDuplicates();
+                showAlert('⚠️ Nomor sudah ada dalam database! Duplikasi dicegah.', 'warning');
+                updateStats();
+            } else {
+                // Tambahkan nomor baru
+                const newEntry = {
+                    code: code || '-',
+                    year: year || '', // Kosongkan jika tidak diisi
+                    number: phoneNumber,
+                    addedDate: new Date().toLocaleString('id-ID')
+                };
+                
+                phoneDatabase.push(newEntry);
+                saveToLocalStorage();
+                showAlert('✓ Nomor berhasil ditambahkan!', 'success');
+                displayPhones();
+                displayDatabase();
+                updateStats();
+            }
+
+            // Kosongkan input
+            codeInput.value = '';
+            yearInput.value = '';
+            phoneInputEl.value = '';
+            codeInput.focus();
+        }
+
+        // Fungsi untuk menampilkan daftar nomor
+        function displayPhones() {
+            const phoneList = document.getElementById('phoneList');
+            
+            if (phoneDatabase.length === 0) {
+                phoneList.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                        <p>Belum ada nomor tersimpan</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Urutkan dari yang terbaru
+            const sortedPhones = [...phoneDatabase].reverse();
+            
+            let tableHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-no">No</th>
+                                <th class="col-code">Kode</th>
+                                <th class="col-year">Tahun</th>
+                                <th class="col-phone">Nomor Telepon</th>
+                                <th class="col-date">Tanggal Ditambahkan</th>
+                                <th class="col-action">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            sortedPhones.forEach((item, index) => {
+                const originalIndex = phoneDatabase.length - 1 - index;
+                tableHTML += `
+                    <tr>
+                        <td class="col-no">${index + 1}</td>
+                        <td class="col-code">${item.code || '-'}</td>
+                        <td class="col-year">${item.year || '-'}</td>
+                        <td class="col-phone">${formatPhoneNumber(item.number)}</td>
+                        <td class="col-date">${item.addedDate}</td>
+                        <td class="col-action">
+                            <button class="btn-delete" onclick="deletePhone(${originalIndex})">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            phoneList.innerHTML = tableHTML;
+        }
+
+        // Fungsi untuk format nomor telepon
+        function formatPhoneNumber(number) {
+            // Format: 0812-3456-7890
+            if (number.startsWith('0') && number.length >= 11) {
+                return number.substring(0, 4) + '-' + number.substring(4, 8) + '-' + number.substring(8);
+            }
+            return number;
+        }
+
+        // Fungsi untuk hapus nomor
+        function deletePhone(index) {
+            if (confirm('Yakin ingin menghapus nomor ini?')) {
+                phoneDatabase.splice(index, 1);
+                saveToLocalStorage();
+                showAlert('Nomor berhasil dihapus!', 'info');
+                displayPhones();
+                displayDatabase();
+                updateStats();
+            }
+        }
+
+        // Fungsi untuk hapus semua data
+        function clearAll() {
+            if (phoneDatabase.length === 0) {
+                showAlert('Database sudah kosong!', 'info');
+                return;
+            }
+
+            if (confirm('Yakin ingin menghapus SEMUA nomor? Tindakan ini tidak dapat dibatalkan!')) {
+                phoneDatabase = [];
+                duplicateCount = 0;
+                saveToLocalStorage();
+                localStorage.setItem('duplicateCount', 0);
+                showAlert('Semua data berhasil dihapus!', 'info');
+                displayPhones();
+                displayDatabase();
+                updateStats();
+            }
+        }
+
+        // Fungsi untuk export data ke CSV (kompatibel dengan Google Sheets)
+        function exportCSV() {
+            if (phoneDatabase.length === 0) {
+                showAlert('Tidak ada data untuk di-export!', 'warning');
+                return;
+            }
+
+            // Header CSV
+            let csvContent = "Kode,Tahun,Nomor Telepon,Tanggal Ditambahkan\n";
+            
+            // Data rows
+            phoneDatabase.forEach(item => {
+                const code = item.code || '-';
+                const year = item.year || '-';
+                const phone = item.number;
+                const date = item.addedDate;
+                csvContent += `"${code}","${year}","${phone}","${date}"\n`;
+            });
+            
+            // Download CSV
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'database_telepon_' + new Date().getTime() + '.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showAlert('✓ Data CSV berhasil di-export!\nBuka Google Sheets → File → Import → Upload file ini', 'success');
+        }
+
+        // Fungsi untuk export data (TXT format lama)
+        function exportData() {
+            if (phoneDatabase.length === 0) {
+                showAlert('Tidak ada data untuk di-export!', 'warning');
+                return;
+            }
+
+            // Format: KODE | TAHUN | NOMOR
+            const dataStr = phoneDatabase.map(item => {
+                const code = item.code || '-';
+                const year = item.year || '-';
+                return `${code} | ${year} | ${item.number}`;
+            }).join('\n');
+            
+            const blob = new Blob([dataStr], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'nomor_telepon_' + new Date().getTime() + '.txt';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showAlert('Data TXT berhasil di-export!', 'success');
+        }
+
+        // Fungsi untuk import file
+        function importFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                processImportedData(content);
+            };
+            reader.readAsText(file);
+        }
+
+        // Fungsi untuk proses data yang diimport
+        function processImportedData(content) {
+            const lines = content.split('\n').map(line => line.trim()).filter(line => line !== '');
+            
+            if (lines.length === 0) {
+                showAlert('File kosong atau tidak valid!', 'warning');
+                return;
+            }
+
+            let addedCount = 0;
+            let duplicateInBatch = 0;
+            let invalidCount = 0;
+            const processedNumbers = new Set();
+
+            // Skip header jika ada (untuk CSV)
+            let startIndex = 0;
+            if (lines[0].toLowerCase().includes('kode') || lines[0].toLowerCase().includes('nomor')) {
+                startIndex = 1;
+            }
+
+            // Proses setiap baris
+            for (let i = startIndex; i < lines.length; i++) {
+                const line = lines[i];
+                let code = '-';
+                let phoneNumber = '';
+
+                // Deteksi format CSV (dengan koma dan quotes)
+                if (line.includes(',')) {
+                    const parts = line.split(',').map(p => p.replace(/"/g, '').trim());
+                    if (parts.length >= 2) {
+                        code = parts[0] || '-';
+                        phoneNumber = parts[1].replace(/\D/g, '');
+                    } else {
+                        phoneNumber = parts[0].replace(/\D/g, '');
+                    }
+                }
+                // Format dengan pipe |
+                else if (line.includes('|')) {
+                    const parts = line.split('|').map(p => p.trim());
+                    if (parts.length >= 2) {
+                        code = parts[0] || '-';
+                        phoneNumber = parts[1].replace(/\D/g, '');
+                    } else {
+                        phoneNumber = parts[0].replace(/\D/g, '');
+                    }
+                }
+                // Format dengan tab
+                else if (line.includes('\t')) {
+                    const parts = line.split('\t').map(p => p.trim());
+                    if (parts.length >= 2) {
+                        code = parts[0] || '-';
+                        phoneNumber = parts[1].replace(/\D/g, '');
+                    } else {
+                        phoneNumber = parts[0].replace(/\D/g, '');
+                    }
+                }
+                // Hanya nomor
+                else {
+                    phoneNumber = line.replace(/\D/g, '');
+                }
+
+                // Validasi minimal 10 digit
+                if (phoneNumber.length < 10) {
+                    invalidCount++;
+                    continue;
+                }
+
+                // Cek duplikasi dalam batch
+                if (processedNumbers.has(phoneNumber)) {
+                    duplicateInBatch++;
+                    continue;
+                }
+
+                processedNumbers.add(phoneNumber);
+
+                // Cek duplikasi dengan database
+                const isDuplicate = phoneDatabase.some(item => item.number === phoneNumber);
+
+                if (isDuplicate) {
+                    duplicateInBatch++;
+                    logDuplicate(phoneNumber, code);
+                } else {
+                    const newEntry = {
+                        code: code.toUpperCase(),
+                        number: phoneNumber,
+                        addedDate: new Date().toLocaleString('id-ID')
+                    };
+                    
+                    phoneDatabase.push(newEntry);
+                    addedCount++;
+                }
+            }
+
+            // Update dan simpan
+            duplicateCount += duplicateInBatch;
+            localStorage.setItem('duplicateCount', duplicateCount);
+            saveToLocalStorage();
+            displayPhones();
+            displayDatabase();
+            displayDuplicates();
+            updateStats();
+
+            // Tampilkan hasil
+            let message = `✓ Import selesai!\n`;
+            message += `• ${addedCount} nomor baru ditambahkan\n`;
+            message += `• ${duplicateInBatch} duplikasi dicegah\n`;
+            if (invalidCount > 0) {
+                message += `• ${invalidCount} nomor tidak valid diabaikan`;
+            }
+
+            showAlert(message, 'success');
+            
+            // Reset file input
+            document.getElementById('fileImport').value = '';
+        }
+
+        // Fungsi untuk update statistik
+        function updateStats() {
+            // Re-read dari localStorage untuk memastikan data terbaru
+            duplicateCount = parseInt(localStorage.getItem('duplicateCount')) || 0;
+            
+            document.getElementById('totalNumbers').textContent = phoneDatabase.length;
+            document.getElementById('duplicateAttempts').textContent = duplicateCount;
+        }
+
+        // Fungsi untuk menyimpan ke localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('phoneDatabase', JSON.stringify(phoneDatabase));
+        }
+
+        // Fungsi untuk menampilkan alert
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = 'alert ' + type;
+            alert.style.display = 'block';
+
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+        // Event listener untuk tombol Enter pada phone input
+        document.getElementById('phoneInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addPhone();
+            }
+        });
+
+        // Event listener untuk tombol Enter pada code input
+        document.getElementById('codeInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('phoneInput').focus();
+            }
+        });
+
+        // Validasi input hanya angka dan karakter tertentu untuk phone
+        document.getElementById('phoneInput').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^\d\+\-\(\)\s]/g, '');
+        });
+
+        // Validasi input untuk kode (alfanumerik dan beberapa karakter khusus)
+        document.getElementById('codeInput').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^a-zA-Z0-9\-\_]/g, '').toUpperCase();
+        });
+    </script>
+</body>
+</html>

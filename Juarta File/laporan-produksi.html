@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TernakPro — Manajemen Ayam & Bebek Petelur</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1a12;--surface:#162219;--surface2:#1e2e22;--surface3:#243529;
+  --accent:#7ecb6e;--accent2:#f5c842;--accent3:#e8734a;
+  --text:#e8f0e8;--text2:#a3b8a3;--text3:#6a8a6a;
+  --border:#2a3e2d;--danger:#e05252;--info:#5ea8d8;
+  --radius:14px;--shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;padding:28px 0;}
+.logo{padding:0 24px 28px;border-bottom:1px solid var(--border);}
+.logo h1{font-family:'Playfair Display',serif;font-size:22px;color:var(--accent);line-height:1.1;}
+.logo span{font-size:11px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;}
+.nav-section{padding:20px 16px 8px;}
+.nav-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;color:var(--text2);transition:all 0.2s;margin-bottom:2px;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:rgba(126,203,110,0.12);color:var(--accent);}
+.nav-item .icon{font-size:18px;width:22px;text-align:center;}
+.main{margin-left:240px;min-height:100vh;}
+.topbar{padding:18px 28px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:rgba(15,26,18,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:50;}
+.topbar-left h2{font-family:'Playfair Display',serif;font-size:22px;}
+.topbar-left p{font-size:12px;color:var(--text3);margin-top:2px;}
+.date-badge{background:var(--surface2);border:1px solid var(--border);padding:7px 14px;border-radius:20px;font-size:12px;color:var(--text2);}
+.content{padding:24px 28px;}
+.page{display:none;animation:fadeUp 0.3s ease;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden;transition:transform 0.2s;}
+.stat-card:hover{transform:translateY(-2px);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.stat-card.green::before{background:linear-gradient(90deg,var(--accent),transparent);}
+.stat-card.yellow::before{background:linear-gradient(90deg,var(--accent2),transparent);}
+.stat-card.orange::before{background:linear-gradient(90deg,var(--accent3),transparent);}
+.stat-card.blue::before{background:linear-gradient(90deg,var(--info),transparent);}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);}
+.stat-value{font-family:'Playfair Display',serif;font-size:30px;color:var(--text);margin:5px 0;}
+.stat-sub{font-size:12px;color:var(--text2);}
+.stat-icon{position:absolute;right:14px;top:14px;font-size:24px;opacity:0.15;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.card-title{font-weight:600;font-size:15px;}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;}
+.badge-green{background:rgba(126,203,110,0.12);color:var(--accent);border:1px solid rgba(126,203,110,0.2);}
+.badge-yellow{background:rgba(245,200,66,0.12);color:var(--accent2);border:1px solid rgba(245,200,66,0.2);}
+.badge-orange{background:rgba(232,115,74,0.12);color:var(--accent3);border:1px solid rgba(232,115,74,0.2);}
+.badge-red{background:rgba(224,82,82,0.12);color:var(--danger);border:1px solid rgba(224,82,82,0.2);}
+.badge-blue{background:rgba(94,168,216,0.12);color:var(--info);border:1px solid rgba(94,168,216,0.2);}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);padding:9px 12px;border-bottom:1px solid var(--border);font-weight:600;}
+td{padding:11px 12px;font-size:13.5px;color:var(--text2);border-bottom:1px solid rgba(42,62,45,0.5);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--surface2);}
+td.bold{font-weight:600;color:var(--text);}
+.progress{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-top:5px;}
+.progress-fill{height:100%;border-radius:3px;transition:width 0.6s;}
+.pf-green{background:var(--accent);}
+.pf-yellow{background:var(--accent2);}
+.pf-orange{background:var(--accent3);}
+.pf-red{background:var(--danger);}
+.pf-blue{background:var(--info);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase;}
+input,select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color 0.2s;outline:none;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(126,203,110,0.1);}
+select option{background:var(--surface2);}
+textarea{resize:vertical;min-height:72px;}
+.btn{padding:9px 18px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--accent);color:#0a1a0a;}
+.btn-primary:hover{background:#6db85f;transform:translateY(-1px);}
+.btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--surface3);color:var(--text);}
+.btn-danger{background:rgba(224,82,82,0.1);color:var(--danger);border:1px solid rgba(224,82,82,0.2);}
+.btn-danger:hover{background:rgba(224,82,82,0.2);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.section-title{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:16px;}
+.alert{padding:12px 14px;border-radius:10px;margin-bottom:10px;display:flex;align-items:flex-start;gap:9px;font-size:13px;}
+.alert-warning{background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.2);color:#d4aa30;}
+.alert-danger{background:rgba(224,82,82,0.08);border:1px solid rgba(224,82,82,0.2);color:#c84040;}
+.alert-success{background:rgba(126,203,110,0.08);border:1px solid rgba(126,203,110,0.2);color:#5aa84d;}
+.alert-icon{font-size:15px;margin-top:1px;flex-shrink:0;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:26px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;animation:fadeUp 0.25s ease;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:19px;}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;padding:4px;line-height:1;}
+.modal-close:hover{color:var(--text);}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.filter-tabs{display:flex;gap:4px;background:var(--surface2);padding:4px;border-radius:10px;width:fit-content;}
+.filter-tab{padding:6px 14px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text3);transition:all 0.2s;border:none;background:transparent;font-family:'DM Sans',sans-serif;}
+.filter-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow);}
+.kandang-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.kandang-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:all 0.2s;}
+.kandang-card:hover{border-color:var(--accent);}
+.kandang-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.kandang-name{font-weight:700;font-size:15px;}
+.kandang-type{font-size:11px;color:var(--text3);margin-top:2px;}
+.kandang-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.ks-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
+.ks-value{font-size:18px;font-weight:700;font-family:'Playfair Display',serif;}
+.pakan-row{display:flex;align-items:center;gap:8px;padding:5px 0;}
+.pakan-color{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.pakan-name{flex:1;font-size:13px;}
+.pakan-pct{font-weight:700;font-size:13px;width:40px;text-align:right;}
+.pakan-bar-wrap{width:70px;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.row-between{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.mt-16{margin-top:16px;}
+.mb-16{margin-bottom:16px;}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;}
+.bar-label{font-size:10px;color:var(--text3);}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.empty-state{text-align:center;padding:28px;color:var(--text3);font-size:13px;}
+.empty-state span{font-size:28px;display:block;margin-bottom:8px;}
+@media(max-width:900px){.sidebar{width:200px;}.main{margin-left:200px;}.stats-grid{grid-template-columns:repeat(2,1fr);}.kandang-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.sidebar{display:none;}.main{margin-left:0;}.stats-grid{grid-template-columns:1fr 1fr;}.grid-2{grid-template-columns:1fr;}.kandang-grid{grid-column:1fr;}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo"><h1>🐣 VIM Farm</h1><span>Manajemen Kandang</span></div>
+  <div class="nav-section">
+    <div class="nav-label">Utama</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="showPage('kandang')"><span class="icon">🏠</span>Kandang</div>
+    <div class="nav-item" onclick="showPage('populasi')"><span class="icon">🐔</span>Populasi</div>
+    <div class="nav-item" onclick="showPage('telur')"><span class="icon">🥚</span>Produksi Telur</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Manajemen</div>
+    <div class="nav-item" onclick="showPage('pakan')"><span class="icon">🌾</span>Pakan</div>
+    <div class="nav-item" onclick="showPage('kesehatan')"><span class="icon">💊</span>Kesehatan</div>
+    <div class="nav-item" onclick="showPage('keuangan')"><span class="icon">💰</span>Keuangan</div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left"><h2 id="page-title">Dashboard</h2><p id="page-sub">Ringkasan kondisi peternakan hari ini</p></div>
+    <div class="row">
+      <div class="date-badge" id="today-date"></div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('modal-input-harian')">+ Input Harian</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div id="dash-alerts"></div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon">🐔</div><div class="stat-label">Total Ayam</div><div class="stat-value" id="d-ayam">0</div><div class="stat-sub" id="d-ayam-sub">—</div></div>
+        <div class="stat-card yellow"><div class="stat-icon">🦆</div><div class="stat-label">Total Bebek</div><div class="stat-value" id="d-bebek">0</div><div class="stat-sub" id="d-bebek-sub">—</div></div>
+        <div class="stat-card orange"><div class="stat-icon">🥚</div><div class="stat-label">Telur Hari Ini</div><div class="stat-value" id="d-telur">0</div><div class="stat-sub" id="d-telur-sub">belum diinput</div></div>
+        <div class="stat-card blue"><div class="stat-icon">📦</div><div class="stat-label">Total Stok Pakan</div><div class="stat-value" id="d-pakan">0</div><div class="stat-sub" id="d-pakan-sub">kg</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Produksi Telur 7 Hari</div><span class="badge badge-green">Tren</span></div>
+          <div id="dash-chart" class="bar-chart" style="height:90px;"></div>
+          <div style="display:flex;gap:12px;margin-top:8px;">
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>Ayam</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent2)"></div>Bebek</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Mortalitas Hari Ini</div></div>
+          <div class="table-wrap"><table><thead><tr><th>Kandang</th><th>Mati</th><th>Sebab</th></tr></thead><tbody id="dash-mortalitas"></tbody></table></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">💰 Keuangan Bulan Ini</div></div>
+          <div id="dash-keuangan"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">📋 Jadwal & Vaksin Hari Ini</div></div>
+          <div id="dash-jadwal" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KANDANG -->
+    <div class="page" id="page-kandang">
+      <div class="row-between mb-16"><div class="section-title">Data Kandang</div><button class="btn btn-primary" onclick="bukaModalKandang()">+ Tambah Kandang</button></div>
+      <div class="kandang-grid" id="kandang-list"></div>
+    </div>
+
+    <!-- POPULASI -->
+    <div class="page" id="page-populasi">
+      <div class="row-between mb-16"><div class="section-title">Manajemen Populasi</div><button class="btn btn-primary" onclick="openModal('modal-mortalitas')">+ Catat Mortalitas</button></div>
+      <div class="grid-2">
+        <div class="card"><div class="card-header"><div class="card-title">Distribusi Populasi</div></div><div id="pop-bars" style="display:flex;flex-direction:column;gap:14px;"></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Riwayat Mortalitas</div></div><div class="table-wrap"><table><thead><tr><th>Tgl</th><th>Kandang</th><th>Mati</th><th>Sebab</th><th></th></tr></thead><tbody id="mort-table"></tbody></table></div></div>
+      </div>
+      <div class="card mt-16"><div class="card-header"><div class="card-title">Detail Populasi</div></div><div class="table-wrap"><table><thead><tr><th>Kandang</th><th>Jenis</th><th>Kap.</th><th>Pop.Awal</th><th>Mati</th><th>Aktif</th><th>Usia</th><th>Status</th><th></th></tr></thead><tbody id="pop-table"></tbody></table></div></div>
+    </div>
+
+    <!-- TELUR -->
+    <div class="page" id="page-telur">
+      <div class="row-between mb-16"><div class="section-title">Produksi Telur</div><button class="btn btn-primary" onclick="bukaModalTelur()">+ Input Telur</button></div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card green"><div class="stat-label">Total Hari Ini</div><div class="stat-value" id="telur-today">0</div><div class="stat-sub" id="telur-today-sub">—</div></div>
+        <div class="stat-card yellow"><div class="stat-label">Rata-rata 7 Hari</div><div class="stat-value" id="telur-avg">0</div><div class="stat-sub">butir/hari</div></div>
+        <div class="stat-card orange"><div class="stat-label">Total Bulan Ini</div><div class="stat-value" id="telur-month">0</div><div class="stat-sub">butir</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-header"><div class="card-title">Per Kandang Hari Ini</div></div><div id="telur-per-kandang" style="display:flex;flex-direction:column;gap:12px;"></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Kualitas Telur Hari Ini</div></div><div id="telur-kualitas" style="display:flex;flex-direction:column;gap:12px;"></div></div>
+      </div>
+      <div class="card mt-16"><div class="card-header"><div class="card-title">Riwayat Produksi</div></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Kandang</th><th>Total</th><th>Grade A</th><th>Grade B</th><th>Rusak</th><th>HDP%</th><th></th></tr></thead><tbody id="telur-table"></tbody></table></div></div>
+    </div>
+
+    <!-- PAKAN -->
+    <div class="page" id="page-pakan">
+      <div class="row-between mb-16"><div class="section-title">Manajemen Pakan</div>
+        <div class="row"><button class="btn btn-secondary" onclick="bukaModalStok()">+ Stok Bahan</button><button class="btn btn-secondary" onclick="bukaModalFormulasi()">+ Formulasi</button><button class="btn btn-primary" onclick="openModal('modal-pakan-harian')">+ Catat Pakan</button></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-header"><div class="card-title">Stok Bahan Pakan</div></div><div class="table-wrap"><table><thead><tr><th>Bahan</th><th>Stok</th><th>Harga/kg</th><th>Min</th><th>Status</th><th></th></tr></thead><tbody id="stok-table"></tbody></table></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Formulasi Pakan</div></div><div id="formulasi-list" style="display:flex;flex-direction:column;gap:12px;"></div></div>
+      </div>
+      <div class="card mt-16"><div class="card-header"><div class="card-title">Riwayat Pemberian Pakan</div></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Kandang</th><th>Formulasi</th><th>Jumlah (kg)</th><th>Per Ekor (g)</th><th></th></tr></thead><tbody id="pakan-harian-table"></tbody></table></div></div>
+    </div>
+
+    <!-- KESEHATAN -->
+    <div class="page" id="page-kesehatan">
+      <div class="row-between mb-16"><div class="section-title">Kesehatan & Vaksinasi</div>
+        <div class="row"><button class="btn btn-secondary" onclick="openModal('modal-vaksin')">+ Vaksin</button><button class="btn btn-secondary" onclick="openModal('modal-obat')">+ Obat</button><button class="btn btn-primary" onclick="openModal('modal-kondisi')">+ Catatan Kondisi</button></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-header"><div class="card-title">Jadwal Vaksinasi</div></div><div class="table-wrap"><table><thead><tr><th>Vaksin</th><th>Kandang</th><th>Tanggal</th><th>Status</th><th></th></tr></thead><tbody id="vaksin-table"></tbody></table></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Catatan Kesehatan</div></div><div id="kondisi-list" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;"></div></div>
+      </div>
+      <div class="card mt-16"><div class="card-header"><div class="card-title">Stok Obat & Vitamin</div></div><div class="table-wrap"><table><thead><tr><th>Nama</th><th>Kegunaan</th><th>Stok</th><th>Satuan</th><th>Exp.</th><th>Status</th><th></th></tr></thead><tbody id="obat-table"></tbody></table></div></div>
+    </div>
+
+    <!-- KEUANGAN -->
+    <div class="page" id="page-keuangan">
+      <div class="row-between mb-16"><div class="section-title">Keuangan Peternakan</div><button class="btn btn-primary" onclick="openModal('modal-transaksi')">+ Tambah Transaksi</button></div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-label">Pemasukan Bulan Ini</div><div class="stat-value" id="keu-masuk">0</div><div class="stat-sub">Rp</div></div>
+        <div class="stat-card orange"><div class="stat-label">Pengeluaran Bulan Ini</div><div class="stat-value" id="keu-keluar">0</div><div class="stat-sub">Rp</div></div>
+        <div class="stat-card blue"><div class="stat-label">Profit Bersih</div><div class="stat-value" id="keu-profit">0</div><div class="stat-sub">Rp</div></div>
+        <div class="stat-card yellow"><div class="stat-label">Total Transaksi</div><div class="stat-value" id="keu-total">0</div><div class="stat-sub">bulan ini</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Riwayat Transaksi</div>
+          <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterKeu(this,'semua')">Semua</button>
+            <button class="filter-tab" onclick="filterKeu(this,'pemasukan')">Pemasukan</button>
+            <button class="filter-tab" onclick="filterKeu(this,'pengeluaran')">Pengeluaran</button>
+          </div>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Jenis</th><th>Jumlah</th><th></th></tr></thead><tbody id="keu-table"></tbody></table></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- Input Harian Shortcut -->
+<div class="modal-overlay" id="modal-input-harian">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📝 Input Data Harian</div><button class="modal-close" onclick="closeModal('modal-input-harian')">✕</button></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button class="btn btn-secondary" style="justify-content:center;padding:18px;flex-direction:column;gap:5px;" onclick="closeModal('modal-input-harian');bukaModalTelur()">🥚<span style="font-size:12px;">Input Telur</span></button>
+      <button class="btn btn-secondary" style="justify-content:center;padding:18px;flex-direction:column;gap:5px;" onclick="closeModal('modal-input-harian');openModal('modal-pakan-harian')">🌾<span style="font-size:12px;">Input Pakan</span></button>
+      <button class="btn btn-secondary" style="justify-content:center;padding:18px;flex-direction:column;gap:5px;" onclick="closeModal('modal-input-harian');openModal('modal-mortalitas')">🐣<span style="font-size:12px;">Catat Mortalitas</span></button>
+      <button class="btn btn-secondary" style="justify-content:center;padding:18px;flex-direction:column;gap:5px;" onclick="closeModal('modal-input-harian');openModal('modal-transaksi')">💰<span style="font-size:12px;">Catat Transaksi</span></button>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-input-harian')">Tutup</button></div>
+  </div>
+</div>
+
+<!-- Modal Kandang -->
+<div class="modal-overlay" id="modal-kandang">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modal-kandang-title">🏠 Tambah Kandang</div><button class="modal-close" onclick="closeModal('modal-kandang')">✕</button></div>
+    <input type="hidden" id="k-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Nama Kandang</label><input id="k-nama" placeholder="Kandang A"></div>
+      <div class="form-group"><label>Jenis Ternak</label><select id="k-jenis"><option>Ayam Petelur</option><option>Bebek Petelur</option></select></div>
+      <div class="form-group"><label>Kapasitas (ekor)</label><input type="number" id="k-kapasitas" min="1" placeholder="500"></div>
+      <div class="form-group"><label>Populasi Awal (ekor)</label><input type="number" id="k-populasi" min="0" placeholder="500"></div>
+      <div class="form-group"><label>Usia (minggu)</label><input type="number" id="k-usia" min="0" placeholder="20"></div>
+      <div class="form-group"><label>Tanggal Masuk</label><input type="date" id="k-tanggal"></div>
+      <div class="form-group"><label>Status</label><select id="k-status"><option>Aktif</option><option>Persiapan</option><option>Istirahat</option></select></div>
+      <div class="form-group"><label>Keterangan</label><input id="k-ket" placeholder="Opsional"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-kandang')">Batal</button>
+      <button class="btn btn-primary" onclick="saveKandang()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Mortalitas -->
+<div class="modal-overlay" id="modal-mortalitas">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🐣 Catat Mortalitas</div><button class="modal-close" onclick="closeModal('modal-mortalitas')">✕</button></div>
+    <input type="hidden" id="mort-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Tanggal</label><input type="date" id="mort-tgl"></div>
+      <div class="form-group"><label>Kandang</label><select id="mort-kandang"></select></div>
+      <div class="form-group"><label>Jumlah Mati (ekor)</label><input type="number" id="mort-jml" min="1" placeholder="0"></div>
+      <div class="form-group"><label>Penyebab</label><input id="mort-sebab" placeholder="Penyakit, cedera..."></div>
+      <div class="form-group full"><label>Keterangan</label><textarea id="mort-ket" placeholder="Detail kondisi..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-mortalitas')">Batal</button>
+      <button class="btn btn-primary" onclick="saveMortalitas()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Telur -->
+<div class="modal-overlay" id="modal-telur">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modal-telur-title">🥚 Input Produksi Telur</div><button class="modal-close" onclick="closeModal('modal-telur')">✕</button></div>
+    <input type="hidden" id="telur-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Tanggal</label><input type="date" id="telur-tgl"></div>
+      <div class="form-group"><label>Kandang</label><select id="telur-kandang"></select></div>
+      <div class="form-group full"><label>Total Telur (butir)</label><input type="number" id="telur-total" min="0" placeholder="0" oninput="autoSplitTelur()"></div>
+      <div class="form-group"><label>Grade A ✅</label><input type="number" id="telur-a" min="0" placeholder="0"></div>
+      <div class="form-group"><label>Grade B ⚡</label><input type="number" id="telur-b" min="0" placeholder="0"></div>
+      <div class="form-group"><label>Rusak/Retak ❌</label><input type="number" id="telur-rusak" min="0" placeholder="0"></div>
+      <div class="form-group full"><label>Catatan</label><input id="telur-ket" placeholder="Opsional"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-telur')">Batal</button>
+      <button class="btn btn-primary" onclick="saveTelur()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Stok Pakan -->
+<div class="modal-overlay" id="modal-stok">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modal-stok-title">📦 Tambah Stok Bahan</div><button class="modal-close" onclick="closeModal('modal-stok')">✕</button></div>
+    <input type="hidden" id="stok-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Nama Bahan</label><input id="stok-nama" placeholder="Jagung Giling"></div>
+      <div class="form-group"><label>Stok (kg)</label><input type="number" id="stok-jml" min="0" step="0.1" placeholder="0"></div>
+      <div class="form-group"><label>Harga per kg (Rp)</label><input type="number" id="stok-harga" min="0" placeholder="0"></div>
+      <div class="form-group"><label>Stok Minimum (kg)</label><input type="number" id="stok-min" min="0" placeholder="50"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-stok')">Batal</button>
+      <button class="btn btn-primary" onclick="saveStok()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Formulasi -->
+<div class="modal-overlay" id="modal-formulasi">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modal-for-title">🔬 Buat Formulasi Pakan</div><button class="modal-close" onclick="closeModal('modal-formulasi')">✕</button></div>
+    <input type="hidden" id="for-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Nama Formulasi</label><input id="for-nama" placeholder="Pakan Laying Ayam"></div>
+      <div class="form-group"><label>Untuk Ternak</label><select id="for-jenis"><option>Ayam Petelur</option><option>Bebek Petelur</option></select></div>
+      <div class="form-group"><label>Dosis (g/ekor/hari)</label><input type="number" id="for-dosis" placeholder="120" min="0"></div>
+      <div class="form-group"><label>Keterangan</label><input id="for-ket" placeholder="Opsional"></div>
+    </div>
+    <div class="divider"></div>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:10px;">Komposisi bahan (total harus = 100%)</p>
+    <div id="for-komposisi" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <button class="btn btn-secondary btn-sm mt-16" onclick="tambahKomp()" style="width:100%;justify-content:center;">+ Tambah Bahan</button>
+    <div id="for-total" style="margin-top:8px;font-size:13px;color:var(--text3);"></div>
+    <div id="for-calc" style="margin-top:10px;padding:12px;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--text2);display:none;line-height:1.8;"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="hitungKebutuhan()">🧮 Hitung Kebutuhan</button>
+      <button class="btn btn-primary" onclick="saveFormulasi()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Pakan Harian -->
+<div class="modal-overlay" id="modal-pakan-harian">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🌾 Catat Pemberian Pakan</div><button class="modal-close" onclick="closeModal('modal-pakan-harian')">✕</button></div>
+    <input type="hidden" id="ph-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Tanggal</label><input type="date" id="ph-tgl"></div>
+      <div class="form-group"><label>Kandang</label><select id="ph-kandang"></select></div>
+      <div class="form-group"><label>Formulasi Pakan</label><select id="ph-formulasi"></select></div>
+      <div class="form-group"><label>Jumlah (kg)</label><input type="number" id="ph-jml" min="0" step="0.1" placeholder="0"></div>
+      <div class="form-group full"><label>Catatan</label><input id="ph-ket" placeholder="Opsional"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-pakan-harian')">Batal</button>
+      <button class="btn btn-primary" onclick="savePakanHarian()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Vaksin -->
+<div class="modal-overlay" id="modal-vaksin">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">💉 Jadwalkan Vaksinasi</div><button class="modal-close" onclick="closeModal('modal-vaksin')">✕</button></div>
+    <input type="hidden" id="vak-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Nama Vaksin</label><input id="vak-nama" placeholder="Newcastle Disease"></div>
+      <div class="form-group"><label>Kandang</label><select id="vak-kandang"></select></div>
+      <div class="form-group"><label>Tanggal</label><input type="date" id="vak-tgl"></div>
+      <div class="form-group"><label>Metode</label><select id="vak-metode"><option>Tetes Mata</option><option>Air Minum</option><option>Injeksi</option><option>Spray</option></select></div>
+      <div class="form-group"><label>Status</label><select id="vak-status"><option>Dijadwalkan</option><option>Selesai</option></select></div>
+      <div class="form-group"><label>Catatan</label><input id="vak-ket" placeholder="Dosis, dll."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-vaksin')">Batal</button>
+      <button class="btn btn-primary" onclick="saveVaksin()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Kondisi -->
+<div class="modal-overlay" id="modal-kondisi">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🏥 Catatan Kondisi Kesehatan</div><button class="modal-close" onclick="closeModal('modal-kondisi')">✕</button></div>
+    <input type="hidden" id="kon-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Tanggal</label><input type="date" id="kon-tgl"></div>
+      <div class="form-group"><label>Kandang</label><select id="kon-kandang"></select></div>
+      <div class="form-group full"><label>Kondisi</label><select id="kon-level"><option value="baik">✅ Baik</option><option value="sedang">⚠️ Perlu Perhatian</option><option value="kritis">🚨 Kritis</option></select></div>
+      <div class="form-group full"><label>Catatan</label><textarea id="kon-catatan" placeholder="Gejala, tindakan yang diambil..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-kondisi')">Batal</button>
+      <button class="btn btn-primary" onclick="saveKondisi()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Obat -->
+<div class="modal-overlay" id="modal-obat">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modal-obat-title">💊 Tambah/Edit Obat</div><button class="modal-close" onclick="closeModal('modal-obat')">✕</button></div>
+    <input type="hidden" id="obat-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Nama Obat/Vitamin</label><input id="obat-nama" placeholder="Terramycin"></div>
+      <div class="form-group"><label>Kegunaan</label><input id="obat-kegunaan" placeholder="Antibakteri"></div>
+      <div class="form-group"><label>Stok</label><input type="number" id="obat-stok" min="0" step="0.1" placeholder="0"></div>
+      <div class="form-group"><label>Satuan</label><select id="obat-satuan"><option>botol</option><option>liter</option><option>kg</option><option>gram</option><option>tablet</option><option>sachet</option></select></div>
+      <div class="form-group full"><label>Tanggal Kadaluarsa</label><input type="date" id="obat-exp"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-obat')">Batal</button>
+      <button class="btn btn-primary" onclick="saveObat()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Transaksi -->
+<div class="modal-overlay" id="modal-transaksi">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modal-tr-title">💰 Tambah Transaksi</div><button class="modal-close" onclick="closeModal('modal-transaksi')">✕</button></div>
+    <input type="hidden" id="tr-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Jenis</label><select id="tr-jenis"><option value="pemasukan">Pemasukan</option><option value="pengeluaran">Pengeluaran</option></select></div>
+      <div class="form-group"><label>Tanggal</label><input type="date" id="tr-tgl"></div>
+      <div class="form-group"><label>Kategori</label><select id="tr-kat"><option>Penjualan Telur</option><option>Penjualan Ayam Afkir</option><option>Pembelian Pakan</option><option>Pembelian Obat/Vaksin</option><option>Biaya Operasional</option><option>Gaji Karyawan</option><option>Lainnya</option></select></div>
+      <div class="form-group"><label>Jumlah (Rp)</label><input type="number" id="tr-jml" min="0" placeholder="0"></div>
+      <div class="form-group full"><label>Keterangan</label><input id="tr-ket" placeholder="Deskripsi transaksi"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-transaksi')">Batal</button>
+      <button class="btn btn-primary" onclick="saveTransaksi()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Konfirmasi Hapus -->
+<div class="modal-overlay" id="modal-hapus">
+  <div class="modal" style="max-width:360px;">
+    <div class="modal-header"><div class="modal-title">🗑️ Konfirmasi Hapus</div><button class="modal-close" onclick="closeModal('modal-hapus')">✕</button></div>
+    <p style="font-size:14px;color:var(--text2);">Yakin ingin menghapus data ini? Aksi tidak bisa dibatalkan.</p>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-hapus')">Batal</button>
+      <button class="btn btn-danger" id="hapus-btn">🗑️ Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════ STORAGE ═══════════
+const S={
+  get:(k)=>{try{return JSON.parse(localStorage.getItem('tp_'+k))||[];}catch(e){return [];}},
+  set:(k,v)=>localStorage.setItem('tp_'+k,JSON.stringify(v)),
+};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,4);
+const today=()=>new Date().toISOString().split('T')[0];
+const thisMonth=()=>new Date().toISOString().substr(0,7);
+const fmtDate=(d)=>{if(!d)return'—';const dt=new Date(d+'T12:00:00');return dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});};
+const fmtRp=(n)=>'Rp '+Number(n).toLocaleString('id-ID');
+const shortRp=(n)=>n>=1000000?(n/1000000).toFixed(1)+'jt':n>=1000?(n/1000).toFixed(0)+'rb':n.toString();
+
+// ═══════════ NAVIGASI ═══════════
+const PAGES={
+  dashboard:['Dashboard','Ringkasan kondisi peternakan hari ini'],
+  kandang:['Data Kandang','Daftar & status semua kandang'],
+  populasi:['Manajemen Populasi','Jumlah ternak, mortalitas, dan riwayat'],
+  telur:['Produksi Telur','Data telur harian, kualitas, dan tren'],
+  pakan:['Manajemen Pakan','Stok bahan, formulasi, dan konsumsi pakan'],
+  kesehatan:['Kesehatan & Vaksinasi','Jadwal vaksin, catatan, dan stok obat'],
+  keuangan:['Keuangan Peternakan','Pemasukan, pengeluaran, dan laporan laba rugi'],
+};
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')?.includes("'"+id+"'"))n.classList.add('active');});
+  document.getElementById('page-title').textContent=PAGES[id][0];
+  document.getElementById('page-sub').textContent=PAGES[id][1];
+  ({dashboard:renderDashboard,kandang:renderKandang,populasi:renderPopulasi,telur:renderTelur,pakan:renderPakan,kesehatan:renderKesehatan,keuangan:renderKeuangan})[id]?.();
+}
+
+// ═══════════ MODAL ═══════════
+function openModal(id){
+  document.getElementById(id).classList.add('show');
+  // Populate kandang selects
+  const ks=S.get('kandang');
+  ['mort-kandang','telur-kandang','ph-kandang','vak-kandang','kon-kandang'].forEach(sid=>{
+    const el=document.getElementById(sid);
+    if(el)el.innerHTML=ks.length?ks.map(k=>`<option value="${k.id}">${k.nama} (${k.jenis})</option>`).join(''):'<option>Belum ada kandang</option>';
+  });
+  // Populate formulasi select
+  const fs=S.get('formulasi');
+  const pf=document.getElementById('ph-formulasi');
+  if(pf)pf.innerHTML=fs.length?fs.map(f=>`<option value="${f.id}">${f.nama}</option>`).join(''):'<option>Belum ada formulasi</option>';
+  // Default dates
+  const t=today();
+  ['mort-tgl','telur-tgl','ph-tgl','vak-tgl','kon-tgl','tr-tgl'].forEach(fid=>{const el=document.getElementById(fid);if(el&&!el.value)el.value=t;});
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+  // Clear edit IDs
+  ['k-id','mort-id','telur-id','stok-id','for-id','ph-id','vak-id','kon-id','obat-id','tr-id'].forEach(h=>{const el=document.getElementById(h);if(el)el.value='';});
+}
+
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});});
+
+function konfirmasiHapus(cb){
+  document.getElementById('modal-hapus').classList.add('show');
+  const b=document.getElementById('hapus-btn');
+  const nb=b.cloneNode(true);b.parentNode.replaceChild(nb,b);
+  nb.onclick=()=>{document.getElementById('modal-hapus').classList.remove('show');cb();};
+}
+
+// ═══════════ TOAST ═══════════
+function toast(msg,type='ok'){
+  const el=document.createElement('div');
+  el.style.cssText=`position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--border);padding:11px 16px;border-radius:12px;font-size:13px;font-weight:500;color:var(--text);box-shadow:var(--shadow);z-index:9999;animation:fadeUp .3s ease;border-left:3px solid ${type==='warn'?'var(--accent3)':'var(--accent)'};max-width:280px;`;
+  el.textContent=msg;document.body.appendChild(el);
+  setTimeout(()=>{el.style.transition='opacity .4s';el.style.opacity='0';setTimeout(()=>el.remove(),400);},2800);
+}
+
+// ═══════════ KANDANG ═══════════
+function bukaModalKandang(id){
+  document.getElementById('modal-kandang-title').textContent=id?'✏️ Edit Kandang':'🏠 Tambah Kandang';
+  if(id){
+    const k=S.get('kandang').find(x=>x.id===id);if(!k)return;
+    document.getElementById('k-id').value=id;
+    document.getElementById('k-nama').value=k.nama;
+    document.getElementById('k-jenis').value=k.jenis;
+    document.getElementById('k-kapasitas').value=k.kapasitas;
+    document.getElementById('k-populasi').value=k.populasiAwal;
+    document.getElementById('k-usia').value=k.usia;
+    document.getElementById('k-tanggal').value=k.tanggal;
+    document.getElementById('k-status').value=k.status;
+    document.getElementById('k-ket').value=k.ket||'';
+  } else {
+    ['k-id','k-nama','k-ket'].forEach(f=>document.getElementById(f).value='');
+    ['k-kapasitas','k-populasi','k-usia'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('k-tanggal').value=today();
+    document.getElementById('k-status').value='Aktif';
+  }
+  document.getElementById('modal-kandang').classList.add('show');
+}
+
+function saveKandang(){
+  const nama=document.getElementById('k-nama').value.trim();
+  if(!nama){toast('⚠️ Nama kandang wajib diisi!','warn');return;}
+  const obj={
+    id:document.getElementById('k-id').value||uid(),
+    nama,jenis:document.getElementById('k-jenis').value,
+    kapasitas:+document.getElementById('k-kapasitas').value||0,
+    populasiAwal:+document.getElementById('k-populasi').value||0,
+    usia:+document.getElementById('k-usia').value||0,
+    tanggal:document.getElementById('k-tanggal').value,
+    status:document.getElementById('k-status').value,
+    ket:document.getElementById('k-ket').value,
+  };
+  const ks=S.get('kandang');
+  const idx=ks.findIndex(k=>k.id===obj.id);
+  if(idx>=0)ks[idx]=obj;else ks.push(obj);
+  S.set('kandang',ks);
+  closeModal('modal-kandang');renderKandang();toast(idx>=0?'✅ Kandang diperbarui!':'✅ Kandang ditambahkan!');
+}
+
+function hapusKandang(id){konfirmasiHapus(()=>{S.set('kandang',S.get('kandang').filter(k=>k.id!==id));renderKandang();toast('🗑️ Kandang dihapus.');});}
+
+function renderKandang(){
+  const ks=S.get('kandang'),ms=S.get('mortalitas');
+  const el=document.getElementById('kandang-list');
+  if(!ks.length){el.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><span>🏠</span>Belum ada kandang. Klik "+ Tambah Kandang" untuk mulai.</div>`;return;}
+  el.innerHTML=ks.map(k=>{
+    const mati=ms.filter(m=>m.kandangId===k.id).reduce((s,m)=>s+m.jumlah,0);
+    const aktif=Math.max(0,(k.populasiAwal||0)-mati);
+    const pct=k.kapasitas>0?Math.round(aktif/k.kapasitas*100):0;
+    const icon=k.jenis.includes('Ayam')?'🐔':'🦆';
+    const sb=k.status==='Aktif'?'badge-green':k.status==='Persiapan'?'badge-yellow':'badge-orange';
+    return `<div class="kandang-card">
+      <div class="kandang-top">
+        <div><div class="kandang-name">${icon} ${k.nama}</div><div class="kandang-type">${k.jenis}</div></div>
+        <span class="badge ${sb}">${k.status}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:4px;"><span>Kapasitas ${pct}%</span><span>${aktif}/${k.kapasitas}</span></div>
+      <div class="progress"><div class="progress-fill ${k.jenis.includes('Ayam')?'pf-green':'pf-yellow'}" style="width:${pct}%"></div></div>
+      <div class="kandang-stats">
+        <div><div class="ks-label">Aktif</div><div class="ks-value">${aktif.toLocaleString()}</div></div>
+        <div><div class="ks-label">Usia</div><div class="ks-value">${k.usia}mg</div></div>
+        <div><div class="ks-label">Mati</div><div class="ks-value" style="color:${mati>5?'var(--accent3)':'inherit'}">${mati}</div></div>
+        <div><div class="ks-label">Masuk</div><div style="font-size:12px;margin-top:2px;">${k.tanggal||'—'}</div></div>
+      </div>
+      <div class="row mt-16" style="gap:6px;">
+        <button class="btn btn-secondary btn-sm" onclick="bukaModalKandang('${k.id}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="hapusKandang('${k.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════ MORTALITAS ═══════════
+function saveMortalitas(){
+  const tgl=document.getElementById('mort-tgl').value;
+  const kandangId=document.getElementById('mort-kandang').value;
+  const jml=+document.getElementById('mort-jml').value||0;
+  const sebab=document.getElementById('mort-sebab').value.trim()||'Tidak diketahui';
+  const ket=document.getElementById('mort-ket').value;
+  if(!tgl||jml<1){toast('⚠️ Lengkapi data!','warn');return;}
+  const kn=S.get('kandang').find(k=>k.id===kandangId);
+  const obj={id:document.getElementById('mort-id').value||uid(),tgl,kandangId,kandangNama:kn?.nama||'',jumlah:jml,sebab,ket};
+  const ms=S.get('mortalitas');const idx=ms.findIndex(m=>m.id===obj.id);
+  if(idx>=0)ms[idx]=obj;else ms.push(obj);
+  S.set('mortalitas',ms);closeModal('modal-mortalitas');renderPopulasi();toast('✅ Mortalitas dicatat!');
+}
+
+function hapusMortalitas(id){konfirmasiHapus(()=>{S.set('mortalitas',S.get('mortalitas').filter(m=>m.id!==id));renderPopulasi();toast('🗑️ Dihapus.');});}
+
+function renderPopulasi(){
+  const ks=S.get('kandang'),ms=S.get('mortalitas');
+  document.getElementById('pop-bars').innerHTML=ks.length?ks.map(k=>{
+    const mati=ms.filter(m=>m.kandangId===k.id).reduce((s,m)=>s+m.jumlah,0);
+    const aktif=Math.max(0,(k.populasiAwal||0)-mati);
+    const pct=k.kapasitas>0?Math.round(aktif/k.kapasitas*100):0;
+    return `<div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px;"><span>${k.jenis.includes('Ayam')?'🐔':'🦆'} ${k.nama}</span><span style="font-weight:700;">${aktif.toLocaleString()} ekor</span></div>
+      <div class="progress"><div class="progress-fill ${k.jenis.includes('Ayam')?'pf-green':'pf-yellow'}" style="width:${pct}%"></div></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px;">${pct}% dari kapasitas ${k.kapasitas}</div>
+    </div>`;
+  }).join(''):'<div class="empty-state"><span>🐔</span>Belum ada kandang.</div>';
+
+  const sorted=[...ms].sort((a,b)=>b.tgl.localeCompare(a.tgl));
+  document.getElementById('mort-table').innerHTML=ms.length?sorted.map(m=>`
+    <tr><td>${fmtDate(m.tgl)}</td><td class="bold">${m.kandangNama}</td><td><span class="badge badge-red">${m.jumlah} ekor</span></td><td>${m.sebab}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="hapusMortalitas('${m.id}')">🗑️</button></td></tr>`).join('')
+    :'<tr><td colspan="5" class="empty-state"><span>✅</span>Tidak ada catatan mortalitas.</td></tr>';
+
+  document.getElementById('pop-table').innerHTML=ks.length?ks.map(k=>{
+    const mati=ms.filter(m=>m.kandangId===k.id).reduce((s,m)=>s+m.jumlah,0);
+    const aktif=Math.max(0,(k.populasiAwal||0)-mati);
+    const sb=k.status==='Aktif'?'badge-green':k.status==='Persiapan'?'badge-yellow':'badge-orange';
+    return `<tr><td class="bold">${k.jenis.includes('Ayam')?'🐔':'🦆'} ${k.nama}</td><td>${k.jenis}</td><td>${k.kapasitas}</td><td>${k.populasiAwal||0}</td>
+      <td><span class="badge ${mati>5?'badge-orange':'badge-green'}">${mati}</span></td><td class="bold">${aktif.toLocaleString()}</td>
+      <td>${k.usia} mg</td><td><span class="badge ${sb}">${k.status}</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="bukaModalKandang('${k.id}')">✏️</button></td></tr>`;
+  }).join(''):'<tr><td colspan="9" class="empty-state">Belum ada data kandang.</td></tr>';
+}
+
+// ═══════════ TELUR ═══════════
+function autoSplitTelur(){
+  const t=+document.getElementById('telur-total').value||0;
+  document.getElementById('telur-a').value=Math.round(t*0.91);
+  document.getElementById('telur-b').value=Math.round(t*0.07);
+  document.getElementById('telur-rusak').value=Math.round(t*0.02);
+}
+
+function bukaModalTelur(id){
+  document.getElementById('modal-telur-title').textContent=id?'✏️ Edit Data Telur':'🥚 Input Produksi Telur';
+  if(id){
+    const t=S.get('telur').find(x=>x.id===id);if(!t)return;
+    openModal('modal-telur');
+    setTimeout(()=>{
+      document.getElementById('telur-id').value=id;
+      document.getElementById('telur-tgl').value=t.tgl;
+      document.getElementById('telur-kandang').value=t.kandangId;
+      document.getElementById('telur-total').value=t.total;
+      document.getElementById('telur-a').value=t.gradeA;
+      document.getElementById('telur-b').value=t.gradeB;
+      document.getElementById('telur-rusak').value=t.rusak;
+      document.getElementById('telur-ket').value=t.ket||'';
+    },80);
+  } else {
+    openModal('modal-telur');
+    setTimeout(()=>{
+      document.getElementById('telur-id').value='';
+      ['telur-total','telur-a','telur-b','telur-rusak'].forEach(f=>document.getElementById(f).value='');
+      document.getElementById('telur-ket').value='';
+    },80);
+  }
+}
+
+function saveTelur(){
+  const tgl=document.getElementById('telur-tgl').value;
+  const kandangId=document.getElementById('telur-kandang').value;
+  const total=+document.getElementById('telur-total').value||0;
+  const gradeA=+document.getElementById('telur-a').value||0;
+  const gradeB=+document.getElementById('telur-b').value||0;
+  const rusak=+document.getElementById('telur-rusak').value||0;
+  const ket=document.getElementById('telur-ket').value;
+  if(!tgl||!kandangId){toast('⚠️ Lengkapi data!','warn');return;}
+  const ks=S.get('kandang'),ms=S.get('mortalitas');
+  const kn=ks.find(k=>k.id===kandangId);
+  const mati=ms.filter(m=>m.kandangId===kandangId).reduce((s,m)=>s+m.jumlah,0);
+  const pop=Math.max(1,(kn?.populasiAwal||1)-mati);
+  const hdp=Math.round(total/pop*1000)/10;
+  const obj={id:document.getElementById('telur-id').value||uid(),tgl,kandangId,kandangNama:kn?.nama||'',total,gradeA,gradeB,rusak,hdp,ket};
+  const ts=S.get('telur');const idx=ts.findIndex(t=>t.id===obj.id);
+  if(idx>=0)ts[idx]=obj;else ts.push(obj);
+  S.set('telur',ts);closeModal('modal-telur');renderTelur();toast('🥚 Data telur disimpan!');
+}
+
+function hapusTelur(id){konfirmasiHapus(()=>{S.set('telur',S.get('telur').filter(t=>t.id!==id));renderTelur();toast('🗑️ Dihapus.');});}
+
+function renderTelur(){
+  const ts=S.get('telur'),ks=S.get('kandang'),ms=S.get('mortalitas');
+  const t=today(),m=thisMonth();
+  const todayD=ts.filter(x=>x.tgl===t);
+  const monthD=ts.filter(x=>x.tgl.startsWith(m));
+  const days7=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days7.push(d.toISOString().split('T')[0]);}
+  const last7=ts.filter(x=>days7.includes(x.tgl));
+  const daySet=[...new Set(last7.map(x=>x.tgl))];
+
+  const todayTotal=todayD.reduce((s,x)=>s+x.total,0);
+  const monthTotal=monthD.reduce((s,x)=>s+x.total,0);
+  const avg=daySet.length>0?Math.round(last7.reduce((s,x)=>s+x.total,0)/daySet.length):0;
+
+  document.getElementById('telur-today').textContent=todayTotal.toLocaleString();
+  document.getElementById('telur-today-sub').textContent=todayD.length+' entri hari ini';
+  document.getElementById('telur-avg').textContent=avg.toLocaleString();
+  document.getElementById('telur-month').textContent=monthTotal.toLocaleString();
+
+  // Per kandang hari ini
+  const pkEl=document.getElementById('telur-per-kandang');
+  const pkData=ks.map(k=>({k,total:todayD.filter(x=>x.kandangId===k.id).reduce((s,x)=>s+x.total,0)})).filter(x=>x.total>0);
+  pkEl.innerHTML=pkData.length?pkData.map(({k,total})=>{
+    const mati=ms.filter(m=>m.kandangId===k.id).reduce((s,m)=>s+m.jumlah,0);
+    const pop=Math.max(1,(k.populasiAwal||1)-mati);
+    const hdp=Math.round(total/pop*1000)/10;
+    const clr=k.jenis.includes('Ayam')?'var(--accent)':'var(--accent2)';
+    return `<div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px;"><span>${k.jenis.includes('Ayam')?'🐔':'🦆'} ${k.nama}</span><span style="font-weight:700;color:${clr}">${total.toLocaleString()} butir (${hdp}%)</span></div>
+      <div class="progress"><div class="progress-fill" style="width:${Math.min(hdp,100)}%;background:${clr}"></div></div>
+    </div>`;
+  }).join(''):'<div class="empty-state"><span>🥚</span>Belum ada data hari ini.</div>';
+
+  // Kualitas
+  const tA=todayD.reduce((s,x)=>s+x.gradeA,0),tB=todayD.reduce((s,x)=>s+x.gradeB,0),tR=todayD.reduce((s,x)=>s+x.rusak,0);
+  const tot=todayTotal||1;
+  document.getElementById('telur-kualitas').innerHTML=todayTotal>0?`
+    <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px;"><span>Grade A ✅</span><span style="font-weight:700;color:var(--accent)">${Math.round(tA/tot*100)}%</span></div><div class="progress"><div class="progress-fill pf-green" style="width:${Math.round(tA/tot*100)}%"></div></div></div>
+    <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px;"><span>Grade B ⚡</span><span style="font-weight:700;color:var(--accent2)">${Math.round(tB/tot*100)}%</span></div><div class="progress"><div class="progress-fill pf-yellow" style="width:${Math.round(tB/tot*100)}%"></div></div></div>
+    <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px;"><span>Rusak ❌</span><span style="font-weight:700;color:var(--danger)">${Math.round(tR/tot*100)}%</span></div><div class="progress"><div class="progress-fill pf-red" style="width:${Math.round(tR/tot*100)}%"></div></div></div>`
+    :'<div class="empty-state"><span>📊</span>Input data telur hari ini untuk melihat kualitas.</div>';
+
+  const sorted=[...ts].sort((a,b)=>b.tgl.localeCompare(a.tgl));
+  document.getElementById('telur-table').innerHTML=ts.length?sorted.map(x=>`
+    <tr><td>${fmtDate(x.tgl)}</td><td class="bold">${x.kandangNama}</td><td class="bold">${x.total.toLocaleString()}</td>
+    <td>${x.gradeA}</td><td>${x.gradeB}</td><td><span class="badge ${x.rusak>0?'badge-red':'badge-green'}">${x.rusak}</span></td>
+    <td><span class="badge ${x.hdp>=70?'badge-green':'badge-yellow'}">${x.hdp}%</span></td>
+    <td><div class="row" style="gap:4px;"><button class="btn btn-secondary btn-sm" onclick="bukaModalTelur('${x.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="hapusTelur('${x.id}')">🗑️</button></div></td></tr>`).join('')
+    :'<tr><td colspan="8" class="empty-state"><span>🥚</span>Belum ada data telur.</td></tr>';
+}
+
+// ═══════════ PAKAN ═══════════
+function bukaModalStok(id){
+  document.getElementById('modal-stok-title').textContent=id?'✏️ Edit Stok Bahan':'📦 Tambah Stok Bahan';
+  if(id){
+    const p=S.get('stokPakan').find(x=>x.id===id);if(!p)return;
+    document.getElementById('stok-id').value=id;
+    document.getElementById('stok-nama').value=p.nama;
+    document.getElementById('stok-jml').value=p.stok;
+    document.getElementById('stok-harga').value=p.harga;
+    document.getElementById('stok-min').value=p.min;
+  } else {
+    ['stok-id','stok-nama','stok-jml','stok-harga','stok-min'].forEach(f=>document.getElementById(f).value='');
+  }
+  document.getElementById('modal-stok').classList.add('show');
+}
+
+function saveStok(){
+  const nama=document.getElementById('stok-nama').value.trim();
+  if(!nama){toast('⚠️ Nama bahan wajib!','warn');return;}
+  const obj={id:document.getElementById('stok-id').value||uid(),nama,stok:+document.getElementById('stok-jml').value||0,harga:+document.getElementById('stok-harga').value||0,min:+document.getElementById('stok-min').value||0};
+  const ps=S.get('stokPakan');const idx=ps.findIndex(p=>p.id===obj.id);
+  if(idx>=0)ps[idx]=obj;else ps.push(obj);
+  S.set('stokPakan',ps);closeModal('modal-stok');renderPakan();toast('📦 Stok disimpan!');
+}
+
+function hapusStok(id){konfirmasiHapus(()=>{S.set('stokPakan',S.get('stokPakan').filter(p=>p.id!==id));renderPakan();toast('🗑️ Dihapus.');});}
+
+// Formulasi
+let kompList=[];
+function bukaModalFormulasi(id){
+  document.getElementById('modal-for-title').textContent=id?'✏️ Edit Formulasi':'🔬 Buat Formulasi Pakan';
+  document.getElementById('for-calc').style.display='none';
+  if(id){
+    const f=S.get('formulasi').find(x=>x.id===id);if(!f)return;
+    document.getElementById('for-id').value=id;
+    document.getElementById('for-nama').value=f.nama;
+    document.getElementById('for-jenis').value=f.jenis;
+    document.getElementById('for-dosis').value=f.dosis;
+    document.getElementById('for-ket').value=f.ket||'';
+    kompList=f.komposisi.map(k=>({...k,id:uid()}));
+  } else {
+    ['for-id','for-nama','for-ket'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('for-dosis').value='';
+    kompList=[];
+  }
+  document.getElementById('modal-formulasi').classList.add('show');
+  setTimeout(renderKompForm,80);
+}
+
+function tambahKomp(){kompList.push({id:uid(),nama:'',pct:0});renderKompForm();}
+function hapusKomp(id){kompList=kompList.filter(k=>k.id!==id);renderKompForm();}
+function updateKomp(id,field,val){const k=kompList.find(x=>x.id===id);if(k)k[field]=field==='pct'?+val:val;if(field==='pct')renderKompForm();}
+
+function renderKompForm(){
+  document.getElementById('for-komposisi').innerHTML=kompList.map(k=>`
+    <div class="row" style="gap:8px;">
+      <input placeholder="Nama bahan" style="flex:2;" value="${k.nama}" oninput="updateKomp('${k.id}','nama',this.value)">
+      <input type="number" placeholder="%" style="flex:1;min-width:70px;" value="${k.pct||''}" min="0" max="100" oninput="updateKomp('${k.id}','pct',this.value)">
+      <span style="font-size:12px;color:var(--text3);">%</span>
+      <button class="btn btn-danger btn-sm" onclick="hapusKomp('${k.id}')" style="padding:5px 9px;">✕</button>
+    </div>`).join('');
+  const tot=kompList.reduce((s,k)=>s+(+k.pct||0),0);
+  document.getElementById('for-total').innerHTML=`Total: <strong style="color:${Math.abs(tot-100)<0.01?'var(--accent)':'var(--accent3)'}">${tot}%</strong> ${Math.abs(tot-100)<0.01?'✅':'— harus 100%'}`;
+}
+
+function hitungKebutuhan(){
+  const dosis=+document.getElementById('for-dosis').value||120;
+  const jenis=document.getElementById('for-jenis').value;
+  const ks=S.get('kandang'),ms=S.get('mortalitas');
+  const pop=ks.filter(k=>k.jenis===jenis).reduce((s,k)=>{const mati=ms.filter(m=>m.kandangId===k.id).reduce((sm,m)=>sm+m.jumlah,0);return s+Math.max(0,(k.populasiAwal||0)-mati);},0);
+  const totalKg=dosis*pop/1000;
+  const el=document.getElementById('for-calc');
+  el.style.display='block';
+  el.innerHTML=`<strong style="color:var(--accent)">Total Kebutuhan: ${totalKg.toFixed(1)} kg/hari</strong> untuk ${pop} ekor ${jenis}<br>`+kompList.map(k=>`• ${k.nama||'?'}: ${(totalKg*(+k.pct||0)/100).toFixed(2)} kg`).join('<br>');
+}
+
+function saveFormulasi(){
+  const nama=document.getElementById('for-nama').value.trim();
+  if(!nama||kompList.length===0){toast('⚠️ Lengkapi nama dan komposisi!','warn');return;}
+  const tot=kompList.reduce((s,k)=>s+(+k.pct||0),0);
+  if(Math.abs(tot-100)>0.01){toast('⚠️ Total komposisi harus 100%!','warn');return;}
+  const obj={id:document.getElementById('for-id').value||uid(),nama,jenis:document.getElementById('for-jenis').value,dosis:+document.getElementById('for-dosis').value||0,ket:document.getElementById('for-ket').value,komposisi:kompList.map(k=>({nama:k.nama,pct:+k.pct}))};
+  const fs=S.get('formulasi');const idx=fs.findIndex(f=>f.id===obj.id);
+  if(idx>=0)fs[idx]=obj;else fs.push(obj);
+  S.set('formulasi',fs);kompList=[];closeModal('modal-formulasi');renderPakan();toast('🔬 Formulasi disimpan!');
+}
+
+function hapusFormulasi(id){konfirmasiHapus(()=>{S.set('formulasi',S.get('formulasi').filter(f=>f.id!==id));renderPakan();toast('🗑️ Dihapus.');});}
+
+function savePakanHarian(){
+  const tgl=document.getElementById('ph-tgl').value;
+  const kandangId=document.getElementById('ph-kandang').value;
+  const formulasiId=document.getElementById('ph-formulasi').value;
+  const jml=+document.getElementById('ph-jml').value||0;
+  const ket=document.getElementById('ph-ket').value;
+  if(!tgl||jml<=0){toast('⚠️ Lengkapi data!','warn');return;}
+  const kn=S.get('kandang').find(k=>k.id===kandangId);
+  const fn=S.get('formulasi').find(f=>f.id===formulasiId);
+  const ms=S.get('mortalitas');
+  const mati=ms.filter(m=>m.kandangId===kandangId).reduce((s,m)=>s+m.jumlah,0);
+  const pop=Math.max(1,(kn?.populasiAwal||1)-mati);
+  const obj={id:document.getElementById('ph-id').value||uid(),tgl,kandangId,kandangNama:kn?.nama||'',formulasiId,formulasiNama:fn?.nama||'—',jml,perEkor:Math.round(jml*1000/pop),ket};
+  const ps=S.get('pakanHarian');const idx=ps.findIndex(p=>p.id===obj.id);
+  if(idx>=0)ps[idx]=obj;else ps.push(obj);
+  S.set('pakanHarian',ps);closeModal('modal-pakan-harian');renderPakan();toast('🌾 Data pakan disimpan!');
+}
+
+function hapusPakanHarian(id){konfirmasiHapus(()=>{S.set('pakanHarian',S.get('pakanHarian').filter(p=>p.id!==id));renderPakan();toast('🗑️ Dihapus.');});}
+
+const WARNA=['#f5c842','#7ecb6e','#5ea8d8','#e8734a','#a0a8e0','#e05252'];
+function renderPakan(){
+  const ps=S.get('stokPakan');
+  document.getElementById('stok-table').innerHTML=ps.length?ps.map(p=>{
+    const s=p.stok<=p.min?'Kritis':p.stok<=p.min*1.5?'Rendah':'Aman';
+    const b=s==='Kritis'?'badge-red':s==='Rendah'?'badge-orange':'badge-green';
+    return `<tr><td class="bold">${p.nama}</td><td>${p.stok} kg</td><td>${fmtRp(p.harga)}</td><td>${p.min} kg</td>
+    <td><span class="badge ${b}">${s}</span></td>
+    <td><div class="row" style="gap:4px;"><button class="btn btn-secondary btn-sm" onclick="bukaModalStok('${p.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="hapusStok('${p.id}')">🗑️</button></div></td></tr>`;
+  }).join(''):'<tr><td colspan="6" class="empty-state"><span>📦</span>Belum ada stok bahan.</td></tr>';
+
+  const fs=S.get('formulasi');
+  document.getElementById('formulasi-list').innerHTML=fs.length?fs.map(f=>`
+    <div style="background:var(--surface2);border-radius:12px;padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div><div style="font-weight:700;">${f.nama}</div><div style="font-size:11px;color:var(--text3);">${f.jenis} — ${f.dosis}g/ekor/hari</div></div>
+        <div class="row" style="gap:4px;"><button class="btn btn-secondary btn-sm" onclick="bukaModalFormulasi('${f.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="hapusFormulasi('${f.id}')">🗑️</button></div>
+      </div>
+      ${f.komposisi.map((k,i)=>`<div class="pakan-row">
+        <div class="pakan-color" style="background:${WARNA[i%WARNA.length]}"></div>
+        <div class="pakan-name">${k.nama}</div><div class="pakan-pct">${k.pct}%</div>
+        <div class="pakan-bar-wrap"><div class="progress"><div class="progress-fill" style="width:${k.pct}%;background:${WARNA[i%WARNA.length]}"></div></div></div>
+      </div>`).join('')}
+    </div>`).join(''):'<div class="empty-state"><span>🔬</span>Belum ada formulasi pakan.</div>';
+
+  const ph=S.get('pakanHarian');
+  const sorted=[...ph].sort((a,b)=>b.tgl.localeCompare(a.tgl));
+  document.getElementById('pakan-harian-table').innerHTML=ph.length?sorted.map(p=>`
+    <tr><td>${fmtDate(p.tgl)}</td><td class="bold">${p.kandangNama}</td><td>${p.formulasiNama}</td><td>${p.jml} kg</td><td>${p.perEkor} g</td>
+    <td><button class="btn btn-danger btn-sm" onclick="hapusPakanHarian('${p.id}')">🗑️</button></td></tr>`).join('')
+    :'<tr><td colspan="6" class="empty-state"><span>🌾</span>Belum ada data pakan.</td></tr>';
+}
+
+// ═══════════ KESEHATAN ═══════════
+function saveVaksin(){
+  const nama=document.getElementById('vak-nama').value.trim();
+  const tgl=document.getElementById('vak-tgl').value;
+  if(!nama||!tgl){toast('⚠️ Lengkapi data!','warn');return;}
+  const kandangId=document.getElementById('vak-kandang').value;
+  const kn=S.get('kandang').find(k=>k.id===kandangId);
+  const obj={id:document.getElementById('vak-id').value||uid(),nama,kandangId,kandangNama:kn?.nama||'',tgl,metode:document.getElementById('vak-metode').value,status:document.getElementById('vak-status').value,ket:document.getElementById('vak-ket').value};
+  const vs=S.get('vaksin');const idx=vs.findIndex(v=>v.id===obj.id);
+  if(idx>=0)vs[idx]=obj;else vs.push(obj);
+  S.set('vaksin',vs);closeModal('modal-vaksin');renderKesehatan();toast('💉 Vaksin disimpan!');
+}
+
+function hapusVaksin(id){konfirmasiHapus(()=>{S.set('vaksin',S.get('vaksin').filter(v=>v.id!==id));renderKesehatan();toast('🗑️ Dihapus.');});}
+function toggleVaksin(id){let vs=S.get('vaksin');vs=vs.map(v=>v.id===id?{...v,status:v.status==='Selesai'?'Dijadwalkan':'Selesai'}:v);S.set('vaksin',vs);renderKesehatan();}
+
+function saveKondisi(){
+  const tgl=document.getElementById('kon-tgl').value;
+  const catatan=document.getElementById('kon-catatan').value.trim();
+  if(!tgl||!catatan){toast('⚠️ Lengkapi catatan!','warn');return;}
+  const kandangId=document.getElementById('kon-kandang').value;
+  const kn=S.get('kandang').find(k=>k.id===kandangId);
+  const obj={id:document.getElementById('kon-id').value||uid(),tgl,kandangId,kandangNama:kn?.nama||'',level:document.getElementById('kon-level').value,catatan};
+  const cs=S.get('kondisi');const idx=cs.findIndex(c=>c.id===obj.id);
+  if(idx>=0)cs[idx]=obj;else cs.push(obj);
+  S.set('kondisi',cs);closeModal('modal-kondisi');renderKesehatan();toast('🏥 Catatan disimpan!');
+}
+
+function hapusKondisi(id){konfirmasiHapus(()=>{S.set('kondisi',S.get('kondisi').filter(c=>c.id!==id));renderKesehatan();toast('🗑️ Dihapus.');});}
+
+function bukaModalObat(id){
+  document.getElementById('modal-obat-title').textContent=id?'✏️ Edit Obat':'💊 Tambah Obat';
+  if(id){
+    const o=S.get('obat').find(x=>x.id===id);if(!o)return;
+    document.getElementById('obat-id').value=id;
+    document.getElementById('obat-nama').value=o.nama;
+    document.getElementById('obat-kegunaan').value=o.kegunaan;
+    document.getElementById('obat-stok').value=o.stok;
+    document.getElementById('obat-satuan').value=o.satuan;
+    document.getElementById('obat-exp').value=o.exp;
+  } else {
+    ['obat-id','obat-nama','obat-kegunaan','obat-stok','obat-exp'].forEach(f=>document.getElementById(f).value='');
+  }
+  document.getElementById('modal-obat').classList.add('show');
+}
+
+function saveObat(){
+  const nama=document.getElementById('obat-nama').value.trim();
+  if(!nama){toast('⚠️ Nama obat wajib!','warn');return;}
+  const obj={id:document.getElementById('obat-id').value||uid(),nama,kegunaan:document.getElementById('obat-kegunaan').value,stok:+document.getElementById('obat-stok').value||0,satuan:document.getElementById('obat-satuan').value,exp:document.getElementById('obat-exp').value};
+  const os=S.get('obat');const idx=os.findIndex(o=>o.id===obj.id);
+  if(idx>=0)os[idx]=obj;else os.push(obj);
+  S.set('obat',os);closeModal('modal-obat');renderKesehatan();toast('💊 Obat disimpan!');
+}
+
+function hapusObat(id){konfirmasiHapus(()=>{S.set('obat',S.get('obat').filter(o=>o.id!==id));renderKesehatan();toast('🗑️ Dihapus.');});}
+
+function renderKesehatan(){
+  const vs=S.get('vaksin'),cs=S.get('kondisi'),os=S.get('obat');
+  const t=today();
+  const sortedV=[...vs].sort((a,b)=>b.tgl.localeCompare(a.tgl));
+  document.getElementById('vaksin-table').innerHTML=vs.length?sortedV.map(v=>{
+    const b=v.status==='Selesai'?'badge-green':'badge-yellow';
+    return `<tr><td class="bold">${v.nama}</td><td>${v.kandangNama}</td><td>${fmtDate(v.tgl)}</td>
+    <td><span class="badge ${b}" style="cursor:pointer" onclick="toggleVaksin('${v.id}')" title="Klik ubah status">${v.status}</span></td>
+    <td><button class="btn btn-danger btn-sm" onclick="hapusVaksin('${v.id}')">🗑️</button></td></tr>`;
+  }).join(''):'<tr><td colspan="5" class="empty-state"><span>💉</span>Belum ada jadwal vaksin.</td></tr>';
+
+  const sortedC=[...cs].sort((a,b)=>b.tgl.localeCompare(a.tgl));
+  document.getElementById('kondisi-list').innerHTML=cs.length?sortedC.map(c=>{
+    const cls=c.level==='baik'?'alert-success':c.level==='kritis'?'alert-danger':'alert-warning';
+    const ico=c.level==='baik'?'✅':c.level==='kritis'?'🚨':'⚠️';
+    return `<div class="alert ${cls}">
+      <span class="alert-icon">${ico}</span>
+      <div style="flex:1;"><div style="font-weight:700;font-size:12px;">${c.kandangNama} — ${fmtDate(c.tgl)}</div><div style="font-size:13px;margin-top:2px;">${c.catatan}</div></div>
+      <button onclick="hapusKondisi('${c.id}')" style="background:none;border:none;color:inherit;cursor:pointer;opacity:0.7;flex-shrink:0;font-size:14px;">✕</button>
+    </div>`;
+  }).join(''):'<div class="empty-state"><span>🏥</span>Belum ada catatan kondisi.</div>';
+
+  const now=new Date(t);
+  document.getElementById('obat-table').innerHTML=os.length?os.map(o=>{
+    const exp=o.exp?new Date(o.exp):null;
+    const diff=exp?Math.floor((exp-now)/(86400000)):999;
+    const s=diff<30?'Hampir exp':o.stok<=2?'Hampir habis':'Aman';
+    const b=s==='Aman'?'badge-green':'badge-orange';
+    return `<tr><td class="bold">${o.nama}</td><td>${o.kegunaan}</td><td>${o.stok}</td><td>${o.satuan}</td><td>${fmtDate(o.exp)}</td>
+    <td><span class="badge ${b}">${s}</span></td>
+    <td><div class="row" style="gap:4px;"><button class="btn btn-secondary btn-sm" onclick="bukaModalObat('${o.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="hapusObat('${o.id}')">🗑️</button></div></td></tr>`;
+  }).join(''):'<tr><td colspan="7" class="empty-state"><span>💊</span>Belum ada data obat.</td></tr>';
+}
+
+// ═══════════ KEUANGAN ═══════════
+let keuFilter='semua';
+function filterKeu(btn,jenis){
+  keuFilter=jenis;
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');renderKeuangan();
+}
+
+function bukaModalTransaksi(id){
+  document.getElementById('modal-tr-title').textContent=id?'✏️ Edit Transaksi':'💰 Tambah Transaksi';
+  if(id){
+    const tr=S.get('keuangan').find(x=>x.id===id);if(!tr)return;
+    document.getElementById('tr-id').value=id;
+    openModal('modal-transaksi');
+    setTimeout(()=>{
+      document.getElementById('tr-jenis').value=tr.jenis;
+      document.getElementById('tr-tgl').value=tr.tgl;
+      document.getElementById('tr-kat').value=tr.kat;
+      document.getElementById('tr-jml').value=tr.jml;
+      document.getElementById('tr-ket').value=tr.ket;
+    },80);
+  } else { openModal('modal-transaksi'); }
+}
+
+function saveTransaksi(){
+  const tgl=document.getElementById('tr-tgl').value;
+  const jml=+document.getElementById('tr-jml').value||0;
+  if(!tgl||jml<=0){toast('⚠️ Lengkapi data!','warn');return;}
+  const obj={id:document.getElementById('tr-id').value||uid(),jenis:document.getElementById('tr-jenis').value,tgl,kat:document.getElementById('tr-kat').value,jml,ket:document.getElementById('tr-ket').value};
+  const ts=S.get('keuangan');const idx=ts.findIndex(t=>t.id===obj.id);
+  if(idx>=0)ts[idx]=obj;else ts.push(obj);
+  S.set('keuangan',ts);closeModal('modal-transaksi');renderKeuangan();toast('💰 Transaksi disimpan!');
+}
+
+function hapusTransaksi(id){konfirmasiHapus(()=>{S.set('keuangan',S.get('keuangan').filter(t=>t.id!==id));renderKeuangan();toast('🗑️ Dihapus.');});}
+
+function renderKeuangan(){
+  const ts=S.get('keuangan');const m=thisMonth();
+  const md=ts.filter(t=>t.tgl.startsWith(m));
+  const masuk=md.filter(t=>t.jenis==='pemasukan').reduce((s,t)=>s+t.jml,0);
+  const keluar=md.filter(t=>t.jenis==='pengeluaran').reduce((s,t)=>s+t.jml,0);
+  const profit=masuk-keluar;
+  document.getElementById('keu-masuk').textContent=shortRp(masuk);
+  document.getElementById('keu-keluar').textContent=shortRp(keluar);
+  document.getElementById('keu-profit').textContent=(profit>=0?'+':'')+shortRp(profit);
+  document.getElementById('keu-profit').closest('.stat-card').querySelector('.stat-value').style.color=profit>=0?'var(--accent)':'var(--danger)';
+  document.getElementById('keu-total').textContent=md.length;
+
+  const filtered=keuFilter==='semua'?ts:ts.filter(t=>t.jenis===keuFilter);
+  const sorted=[...filtered].sort((a,b)=>b.tgl.localeCompare(a.tgl));
+  document.getElementById('keu-table').innerHTML=filtered.length?sorted.map(t=>{
+    const b=t.jenis==='pemasukan'?'badge-green':'badge-orange';
+    const clr=t.jenis==='pemasukan'?'var(--accent)':'var(--accent3)';
+    const icon=t.jenis==='pemasukan'?'▲':'▼';
+    return `<tr><td>${fmtDate(t.tgl)}</td><td class="bold">${t.ket}</td><td>${t.kat}</td>
+    <td><span class="badge ${b}">${t.jenis}</span></td>
+    <td style="font-weight:700;color:${clr};">${icon} ${fmtRp(t.jml)}</td>
+    <td><div class="row" style="gap:4px;"><button class="btn btn-secondary btn-sm" onclick="bukaModalTransaksi('${t.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="hapusTransaksi('${t.id}')">🗑️</button></div></td></tr>`;
+  }).join(''):'<tr><td colspan="6" class="empty-state"><span>💰</span>Belum ada transaksi.</td></tr>';
+}
+
+// ═══════════ DASHBOARD ═══════════
+function renderDashboard(){
+  const ks=S.get('kandang'),ms=S.get('mortalitas'),ts=S.get('telur'),ps=S.get('stokPakan'),vs=S.get('vaksin'),keu=S.get('keuangan');
+  const t=today(),m=thisMonth();
+
+  const getPop=(jenis)=>ks.filter(k=>k.jenis.includes(jenis)).reduce((s,k)=>{const mati=ms.filter(x=>x.kandangId===k.id).reduce((sm,x)=>sm+x.jumlah,0);return s+Math.max(0,(k.populasiAwal||0)-mati);},0);
+  const ayam=getPop('Ayam'),bebek=getPop('Bebek');
+  document.getElementById('d-ayam').textContent=ayam.toLocaleString();
+  document.getElementById('d-ayam-sub').textContent=ks.filter(k=>k.jenis.includes('Ayam')&&k.status==='Aktif').length+' Kandang Aktif';
+  document.getElementById('d-bebek').textContent=bebek.toLocaleString();
+  document.getElementById('d-bebek-sub').textContent=ks.filter(k=>k.jenis.includes('Bebek')&&k.status==='Aktif').length+' Kandang Aktif';
+
+  const todayTelur=ts.filter(x=>x.tgl===t).reduce((s,x)=>s+x.total,0);
+  document.getElementById('d-telur').textContent=todayTelur.toLocaleString();
+  document.getElementById('d-telur-sub').textContent=todayTelur===0?'Belum diinput hari ini':'butir hari ini';
+
+  const totalPakan=ps.reduce((s,p)=>s+p.stok,0);
+  document.getElementById('d-pakan').textContent=totalPakan.toFixed(0);
+  document.getElementById('d-pakan-sub').textContent=ps.length+' jenis bahan';
+
+  // Chart 7 hari
+  const days7=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days7.push(d.toISOString().split('T')[0]);}
+  const maxV=Math.max(1,...days7.map(d=>ts.filter(x=>x.tgl===d).reduce((s,x)=>s+x.total,0)));
+  document.getElementById('dash-chart').innerHTML=days7.map(d=>{
+    const dt=ts.filter(x=>x.tgl===d);
+    const ayamV=dt.filter(x=>{const k=ks.find(y=>y.id===x.kandangId);return k?.jenis.includes('Ayam');}).reduce((s,x)=>s+x.total,0);
+    const bebekV=dt.filter(x=>{const k=ks.find(y=>y.id===x.kandangId);return k?.jenis.includes('Bebek');}).reduce((s,x)=>s+x.total,0);
+    const hA=Math.max(4,ayamV/maxV*80);const hB=Math.max(4,bebekV/maxV*80);
+    const label=new Date(d+'T12:00:00').toLocaleDateString('id-ID',{weekday:'short'});
+    return `<div class="bar-wrap" style="height:90px;">
+      <div style="flex:1;display:flex;flex-direction:column-reverse;gap:1px;align-items:stretch;justify-content:flex-start;">
+        ${ayamV>0?`<div class="bar" style="height:${hA}px;background:var(--accent)"></div>`:''}
+        ${bebekV>0?`<div class="bar" style="height:${hB}px;background:var(--accent2)"></div>`:''}
+        ${ayamV===0&&bebekV===0?`<div class="bar" style="height:4px;background:var(--surface3)"></div>`:''}
+      </div>
+      <div class="bar-label">${label}</div>
+    </div>`;
+  }).join('');
+
+  // Alerts
+  const alerts=[];
+  ps.filter(p=>p.stok<=p.min).forEach(p=>alerts.push(`<div class="alert alert-danger"><span class="alert-icon">📦</span>Stok <strong>${p.nama}</strong> kritis! Sisa ${p.stok}kg (min ${p.min}kg)</div>`));
+  vs.filter(v=>v.status!=='Selesai').forEach(v=>{const diff=Math.floor((new Date(v.tgl+'T12:00:00')-new Date(t+'T12:00:00'))/86400000);if(diff>=0&&diff<=7)alerts.push(`<div class="alert alert-warning"><span class="alert-icon">💉</span>Vaksin <strong>${v.nama}</strong> untuk ${v.kandangNama} dalam <strong>${diff} hari</strong></div>`);});
+  if(todayTelur===0&&ks.filter(k=>k.status==='Aktif').length>0)alerts.push(`<div class="alert alert-warning"><span class="alert-icon">🥚</span>Data produksi telur hari ini belum diinput.</div>`);
+  document.getElementById('dash-alerts').innerHTML=alerts.join('');
+
+  // Mortalitas hari ini
+  const tm=ms.filter(x=>x.tgl===t);
+  document.getElementById('dash-mortalitas').innerHTML=tm.length?tm.map(x=>`<tr><td class="bold">${x.kandangNama}</td><td><span class="badge badge-red">${x.jumlah} ekor</span></td><td>${x.sebab}</td></tr>`).join('')
+    :'<tr><td colspan="3" style="text-align:center;color:var(--text3);font-size:13px;padding:14px;">Tidak ada mortalitas hari ini ✅</td></tr>';
+
+  // Keuangan bulan ini
+  const masuk=keu.filter(x=>x.tgl.startsWith(m)&&x.jenis==='pemasukan').reduce((s,x)=>s+x.jml,0);
+  const keluar=keu.filter(x=>x.tgl.startsWith(m)&&x.jenis==='pengeluaran').reduce((s,x)=>s+x.jml,0);
+  const profit=masuk-keluar;
+  document.getElementById('dash-keuangan').innerHTML=`
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;color:var(--text2);">Pemasukan</span><span style="font-weight:700;color:var(--accent);">${fmtRp(masuk)}</span></div>
+    <div class="progress" style="margin-bottom:10px;"><div class="progress-fill pf-green" style="width:100%"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;color:var(--text2);">Pengeluaran</span><span style="font-weight:700;color:var(--accent3);">${fmtRp(keluar)}</span></div>
+    <div class="progress" style="margin-bottom:10px;"><div class="progress-fill pf-orange" style="width:${masuk>0?Math.min(100,Math.round(keluar/masuk*100)):0}%"></div></div>
+    <div class="divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:600;">Profit Bersih</span><span style="font-size:20px;font-weight:700;font-family:'Playfair Display',serif;color:${profit>=0?'var(--accent)':'var(--danger)'};">${fmtRp(profit)}</span></div>
+    ${keu.length===0?'<div style="text-align:center;color:var(--text3);font-size:12px;margin-top:8px;">Belum ada transaksi</div>':''}
+  `;
+
+  // Jadwal
+  const todayVaksin=vs.filter(v=>v.tgl===t&&v.status!=='Selesai');
+  document.getElementById('dash-jadwal').innerHTML=[
+    {n:'Pemberian Pakan Pagi',i:'06:00 — Semua Kandang',ico:'🌾'},
+    {n:'Koleksi Telur',i:'09:00 — Semua Kandang',ico:'🥚'},
+    {n:'Pemberian Pakan Siang',i:'12:00 — Semua Kandang',ico:'🌾'},
+    ...todayVaksin.map(v=>({n:'Vaksinasi: '+v.nama,i:v.kandangNama,ico:'💉'})),
+  ].map(j=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+    <span style="font-size:20px;">${j.ico}</span>
+    <div><div style="font-size:13px;font-weight:600;color:var(--text);">${j.n}</div><div style="font-size:11px;color:var(--text3);">${j.i}</div></div>
+  </div>`).join('');
+}
+
+// ═══════════ INIT ═══════════
+document.getElementById('today-date').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('k-tanggal').value=today();
+renderDashboard();
+</script>
+</body>
+</html>
